@@ -10,6 +10,8 @@ This project provides a Python-based API scraper for retrieving **soil moisture 
 
 This effort is part of **WISE Pro** (Water Irrigation Scheduling for Efficient Application), an integrated software platform designed to improve irrigation and nutrient management in cropland agriculture. The goal is to assimilate **real-time soil moisture sensor data** to support **data-driven irrigation decisions**.
 
+IrriMAX Live API Documentation: [https://irrimaxlive.sentek.com.au/api/docs](https://irrimaxlive.sentek.com.au/api/docs)
+
 ## Features
 - **Authentication via API Key** (secured using `config.py`).
 - **Fetch logger details** to identify available soil moisture probes.
