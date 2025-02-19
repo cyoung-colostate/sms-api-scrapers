@@ -22,6 +22,7 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import datetime
 import config  # Import API key from config.py
+from io import StringIO
 
 # Constants
 BASE_URL = "https://www.irrimaxlive.com/api/"
@@ -89,7 +90,7 @@ def get_readings(logger_name, from_date=None, to_date=None):
 
     if response.status_code == 200:
         csv_data = response.text.splitlines()
-        df = pd.read_csv(pd.compat.StringIO("\n".join(csv_data)))
+        df = pd.read_csv(StringIO("\n".join(csv_data)))
         return df
     else:
         raise Exception(f"Error fetching readings: {response.status_code} - {response.text}")
