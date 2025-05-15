@@ -18,6 +18,8 @@ from typing import List
 # 1. SENTEK / IrriMAX Live
 # ───────────────────────────────────────────────
 IRRIMAX_API_KEY: str = "REPLACE_WITH_YOUR_IRRIMAX_API_KEY"
+# Demo key:
+#IRRIMAX_API_KEY: str = "56ba75ce-af38-4f10-9147-6f0d9ec82b12"
 
 
 # ───────────────────────────────────────────────
@@ -33,6 +35,9 @@ AQUASPY_SITE_IDS: List[int] = ["REPLACE_WITH_SITE_ID_1", "REPLACE_WITH_SITE_ID_2
 # ───────────────────────────────────────────────
 GROGURU_USERNAME: str = "REPLACE_WITH_YOUR_EMAIL"
 GROGURU_PASSWORD: str = "REPLACE_WITH_YOUR_PASSWORD"
+# Demo credentials:
+#GROGURU_USERNAME: str = "GroGuru Demo"
+#GROGURU_PASSWORD: str = "groguru"
 
 
 # ───────────────────────────────────────────────
