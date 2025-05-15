@@ -28,6 +28,7 @@ LOGIN_ENDPOINT = f"{BASE_URL}/user/signin"
 ORG_VIEW_ENDPOINT = f"{BASE_URL}/org/view/{{user_id}}"
 GRAPH_DATA_ENDPOINT = f"{BASE_URL}/stem/graph-data/{{siteId}}/{{deviceId}}/"
 
+
 def authenticate(email, password):
     print("Authenticating with GroGuru API...")
     payload = {"email": email, "password": password}
@@ -45,6 +46,7 @@ def authenticate(email, password):
         print(f"Login failed. HTTP {response.status_code} - {response.text}")
         sys.exit(1)
 
+
 def get_organization_view(token, userid):
     print("Fetching organization view...")
     headers = {"Authorization": token}
@@ -61,8 +63,8 @@ def get_organization_view(token, userid):
         print(f"Failed to get organization view. HTTP {response.status_code} - {response.text}")
     return None
 
+
 def list_sites_from_org(org_data):
-    """Extract and flatten site information from org response."""
     sites = []
     try:
         for farm in org_data.get("children", []):
@@ -78,8 +80,31 @@ def list_sites_from_org(org_data):
         print("Unexpected format in org view response.")
     return sites
 
+
+def flatten_graph_data(graph):
+    all_data = {}
+    for key, content in graph.items():
+        abs_data = content.get("absolute")
+        if not abs_data:
+            continue
+        for entry in abs_data:
+            ts = entry.get("xValue")
+            if not ts:
+                continue
+            if ts not in all_data:
+                all_data[ts] = {}
+            for k, v in entry.items():
+                if k != "xValue":
+                    col_name = f"{key}{k}" if k.isdigit() else key
+                    all_data[ts][col_name] = v
+    df = pd.DataFrame.from_dict(all_data, orient="index")
+    df.index.name = "timestamp"
+    df.reset_index(inplace=True)
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    return df
+
+
 def get_readings(token, site_id, device_id, from_date, to_date):
-    """Fetch GroGuru sensor readings using /stem/graph-data/ endpoint."""
     print(f"Fetching readings for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
     headers = {"Authorization": token}
     params = {
@@ -91,24 +116,12 @@ def get_readings(token, site_id, device_id, from_date, to_date):
 
     if response.status_code == 200:
         json_data = response.json()
-        if not json_data.get("data"):
-            print("No data returned.")
+        graph_data = json_data.get("data", {}).get("graph", {})
+        if not graph_data:
+            print("No graph data returned.")
             return pd.DataFrame()
 
-        print("Raw response keys:", json_data["data"].keys())
-
-        graph_data = json_data["data"].get("graph", {})
-        absolute_data = graph_data.get("absolute", [])
-
-        if not absolute_data:
-            print("No absolute sensor data found.")
-            return pd.DataFrame()
-
-        # Flatten absolute data
-        df_flat = pd.DataFrame(absolute_data)
-        df_flat = df_flat.rename(columns={"xValue": "timestamp", "yValue": "value"})
-        df_flat["timestamp"] = pd.to_datetime(df_flat["timestamp"])
-
+        df_flat = flatten_graph_data(graph_data)
         print(df_flat.head())
         return df_flat
 
