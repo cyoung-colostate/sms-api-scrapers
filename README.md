@@ -1,51 +1,100 @@
-# IrriMAX Live API Scraper
-Created by **A.J. Brown**
-Agricultural Data Scientist
-CSU Agriulctural Water Quality Program
+# Soil‑Moisture Sensor API Scrapers  
+Created by **A.J. Brown**  
+Agricultural Data Scientist — CSU Agricultural Water Quality Program  
 [Ansley.Brown@colostate.edu](mailto:Ansley.Brown@colostate.edu)
 
-## Overview
+---
 
-This project provides a Python-based API scraper for retrieving **soil moisture sensor data** from the **IrriMAX Live API v1.9** by Sentek. The script fetches logger details, retrieves readings for a given time range, and saves the data in a CSV file. 
+## 1 • Project Scope
 
-This effort is part of **WISE Pro** (Water Irrigation Scheduling for Efficient Application), an integrated software platform designed to improve irrigation and nutrient management in cropland agriculture. The goal is to assimilate **real-time soil moisture sensor data** to support **data-driven irrigation decisions**.
+This repository houses **API-based data fetching tools** for three commercial soil‑moisture platforms:
 
-IrriMAX Live API Documentation: [https://irrimaxlive.sentek.com.au/api/docs](https://irrimaxlive.sentek.com.au/api/docs)
+| Vendor        | API Docs / Swagger | Script |
+|---------------|--------------------|--------|
+| **Sentek IrriMAX Live v1.9** | <https://irrimaxlive.sentek.com.au/api/docs> | `irrimax_scraper.py` |
+| **AquaSpy**   | <https://agspy.aquaspy.com/apioverview> | `aquaspy_scraper.py` *(WIP)* |
+| **GroGuru InSites** | <https://groguruinsites.docs.apiary.io/> | `groguru_scraper.py` *(WIP)* |
 
-## Features
-- **Authentication via API Key** (secured using `config.py`).
-- **Fetch logger details** to identify available soil moisture probes.
-- **Retrieve time-series sensor data** in CSV format.
-- **Automate data collection** for integration into **WISE Pro**.
+All scrapers share a common goal: **fetch logger metadata + time‑series moisture data → return a tidy `pandas.DataFrame`** that can be streamed directly into **WISE Pro** (Water Irrigation Scheduling for Efficient Application).
 
-## Installation
-### **1. Clone the Repository**
+---
+
+## 2 • Why this matters for **WISE Pro**
+
+WISE Pro is an integrated decision‑support platform jointly developed by CSU, USDA‑ARS, and NMSU. It fuses real‑time sensing, machine‑learning data assimilation, and SWAT+/pyFAO56 modeling to generate **actionable irrigation & nutrient recommendations**.  
+Automated ingestion of Sentek, AquaSpy, and GroGuru data:
+
+* improves water‑balance forecasts,
+* reduces manual file wrangling, and
+* enables comparative analytics across hardware vendors.
+
+---
+
+## 3 • Repository Layout
 ```bash
-git clone https://github.com/your-repo-name/irrimax-scraper.git
-cd irrimax-scraper
+/code
+├── irrimax_scraper.py
+├── aquaspy_scraper.py # coming soon
+├── groguru_scraper.py # coming soon
+├── utils.py # shared helpers (date parsing, retry logic, etc.)
+├── config_template.py # template to create user-specific config.h
+└── config.py # must be created by user and updated with credentials
 ```
 
-## Create a Virtual Environment (Optional)
+---
+
+## 4 • Quick Start
+
 ```bash
-python -m venv venv
-source venv/bin/activate  # On macOS/Linux
-venv\Scripts\activate      # On Windows
+# clone & create env
+git clone https://github.com/your-org/soil‑moisture‑scrapers.git
+cd soil‑moisture‑scrapers
+python -m venv venv && source venv/bin/activate   # Windows: venv\Scripts\activate
+
+# install shared deps
+pip install -r requirements.txt
 ```
 
-## Install Dependencies
+### 4.1 Configure Secrets  
+1. Create your private config file (one place for every platform’s credentials):  
+   ```bash
+   cp code/config_template.py code/config.py
+   ```
+
+2. Add your credentials / API keys.
+
+3. Do not commit `config.py` - it is already listed in `.gitignore`
+
+### 4.2 Run a scrape (IrriMAX example)
 ```bash
-pip install requests
+python code/irrimax_scraper.py \
+  --logger "Soybeans 1" \
+  --days-back 7
 ```
+The script prints the first few rows of the returned DataFrame; saving to CSV / DB is optional and can be added downstream.
 
-## Configure API key in `config.py`
-```python
-API_KEY = "YOUR_API_KEY_HERE"  # Replace with your actual API key
-```
+## 5 • Common Features
 
-# Integration with WISE Pro
-Developed for the WISE Pro Project – A collaboration between Colorado State University, USDA-ARS, and New Mexico State University to improve agricultural sustainability and water conservation through an improved irrigation and nutrient management software for agricultural managers.
+* **Secure authentication** — credentials isolated in private config files.  
+* **Logger discovery** — enumerate available sites/probes before requesting data.  
+* **Date‑range queries** — RFC‑3339 / yyyymmddHHMMSS handled automatically.  
+* **Returns `pandas.DataFrame`** — ready for in‑memory analytics or other pipelines.  
+* Optional **CSV export** or direct write to Postgres/BigQuery (coming soon).
 
-WISE Pro is a decision support system that integrates sensor data, machine learning, and process-based modeling to optimize irrigation and nutrient application. This scraper automates the ingestion of real-time soil moisture data into WISE Pro’s database, improving forecasting and advisory recommendations.
+> [!NOTE] 
+> Data are returned in the same schema as the vendor provides; unification may be a feature added later.
 
-# License
-This project is licensed under the GNU General Public License v2.0.
+---
+
+## 6 • Contributing
+
+1. Fork → feature branch → PR.  
+2. Follow PEP8; run `black` before committing.  
+3. Unit tests live in `tests/`; please add coverage for new endpoints.
+
+---
+
+## 7 • License
+
+GNU General Public License v2.0  
+© 2025 Ansley Joseph Brown

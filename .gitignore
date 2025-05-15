@@ -1,3 +1,6 @@
+# Hide login credentials
+login_info.md
+
 # Hide config file in code folder
 code/config.py
 
