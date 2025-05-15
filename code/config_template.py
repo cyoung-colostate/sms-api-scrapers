@@ -19,30 +19,18 @@ IRRIMAX_API_KEY: str = "REPLACE_WITH_YOUR_IRRIMAX_API_KEY"
 
 
 # ───────────────────────────────────────────────
-# 2. AquaSpy (AgSpy)
-#    Choose whichever auth method your account uses.
+# 4. AquaSpy AgSpy
 # ───────────────────────────────────────────────
-# If your AquaSpy account uses a token:
-# AQUASPY_API_TOKEN: str = "REPLACE_WITH_YOUR_AQUASPY_TOKEN"
+AQUASPY_SITE_IDS: List[int] = [REPLACE_WITH_SITE_ID_1, REPLACE_WITH_SITE_ID_2]
 
-# …or, if it requires user credentials:
-# AQUASPY_USERNAME: str = "REPLACE_WITH_YOUR_AQUASPY_USERNAME"
-# AQUASPY_PASSWORD: str = "REPLACE_WITH_YOUR_AQUASPY_PASSWORD"
-
+# NOTE: While this API does not require authentication, ensure that the siteID 
+# values are kept confidential to prevent unauthorized data access.
 
 # ───────────────────────────────────────────────
-# 3. GroGuru InSites
-#    The API can be accessed either with OAuth‑style
-#    client credentials *or* a static API key.
+# 3. GroGuru InSites
 # ───────────────────────────────────────────────
-# OAuth flow (preferred):
-# GROGURU_CLIENT_ID: str     = "REPLACE_WITH_YOUR_GROGURU_CLIENT_ID"
-# GROGURU_CLIENT_SECRET: str = "REPLACE_WITH_YOUR_GROGURU_CLIENT_SECRET"
-# GROGURU_USERNAME: str      = "REPLACE_WITH_YOUR_GROGURU_USERNAME"
-# GROGURU_PASSWORD: str      = "REPLACE_WITH_YOUR_GROGURU_PASSWORD"
-
-# …or static key:
-# GROGURU_API_KEY: str = "REPLACE_WITH_YOUR_GROGURU_API_KEY"
+GROGURU_USERNAME: str = "REPLACE_WITH_YOUR_EMAIL"
+GROGURU_PASSWORD: str = "REPLACE_WITH_YOUR_PASSWORD"
 
 
 # ───────────────────────────────────────────────

@@ -26,7 +26,7 @@ from io import StringIO
 
 # Constants
 BASE_URL = "https://www.irrimaxlive.com/api/"
-API_KEY = config.API_KEY
+API_KEY = config.IRRIMAX_API_KEY
 
 def get_loggers():
     """Fetch and parse logger details from IrriMAX Live API."""

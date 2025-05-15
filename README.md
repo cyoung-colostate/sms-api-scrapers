@@ -36,7 +36,6 @@ Automated ingestion of Sentek, AquaSpy, and GroGuru data:
 ├── irrimax_scraper.py
 ├── aquaspy_scraper.py # coming soon
 ├── groguru_scraper.py # coming soon
-├── utils.py # shared helpers (date parsing, retry logic, etc.)
 ├── config_template.py # template to create user-specific config.h
 └── config.py # must be created by user and updated with credentials
 ```
