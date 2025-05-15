@@ -26,8 +26,7 @@ GROGURU_PASSWORD = config.GROGURU_PASSWORD
 BASE_URL = "https://api.groguru.com"
 LOGIN_ENDPOINT = f"{BASE_URL}/user/signin"
 ORG_VIEW_ENDPOINT = f"{BASE_URL}/org/view/{{user_id}}"
-READINGS_ENDPOINT = f"{BASE_URL}/site/data"
-
+GRAPH_DATA_ENDPOINT = f"{BASE_URL}/stem/graph-data/{{siteId}}/{{deviceId}}/"
 
 def authenticate(email, password):
     print("Authenticating with GroGuru API...")
@@ -46,7 +45,6 @@ def authenticate(email, password):
         print(f"Login failed. HTTP {response.status_code} - {response.text}")
         sys.exit(1)
 
-
 def get_organization_view(token, userid):
     print("Fetching organization view...")
     headers = {"Authorization": token}
@@ -63,7 +61,6 @@ def get_organization_view(token, userid):
         print(f"Failed to get organization view. HTTP {response.status_code} - {response.text}")
     return None
 
-
 def list_sites_from_org(org_data):
     """Extract and flatten site information from org response."""
     sites = []
@@ -74,23 +71,23 @@ def list_sites_from_org(org_data):
                     "farm": farm.get("name"),
                     "name": site.get("name"),
                     "siteId": site.get("siteId"),
-                    "id": site.get("id")
+                    "id": site.get("id"),
+                    "twigId": site.get("twigId")
                 })
     except KeyError:
         print("Unexpected format in org view response.")
     return sites
 
-
-def get_readings(token, site_id, from_date, to_date):
-    """Fetch GroGuru sensor readings for a specific site and date range."""
-    print(f"Fetching readings for site {site_id} from {from_date.date()} to {to_date.date()}...")
+def get_readings(token, site_id, device_id, from_date, to_date):
+    """Fetch GroGuru sensor readings using /stem/graph-data/ endpoint."""
+    print(f"Fetching readings for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
     headers = {"Authorization": token}
-    payload = {
-        "siteId": site_id,
-        "fromDate": from_date.strftime("%Y-%m-%dT00:00:00.000Z"),
-        "toDate": to_date.strftime("%Y-%m-%dT23:59:59.000Z"),
+    params = {
+        "fromDate": from_date.strftime("%Y-%m-%d"),
+        "toDate": to_date.strftime("%Y-%m-%d")
     }
-    response = requests.post(READINGS_ENDPOINT, headers=headers, json=payload)
+    url = f"{BASE_URL}/stem/graph-data/{site_id}/{device_id}/"
+    response = requests.get(url, headers=headers, params=params)
 
     if response.status_code == 200:
         json_data = response.json()
@@ -98,9 +95,23 @@ def get_readings(token, site_id, from_date, to_date):
             print("No data returned.")
             return pd.DataFrame()
 
-        df = pd.DataFrame(json_data["data"])
-        print(df.head())
-        return df
+        print("Raw response keys:", json_data["data"].keys())
+
+        graph_data = json_data["data"].get("graph", {})
+        absolute_data = graph_data.get("absolute", [])
+
+        if not absolute_data:
+            print("No absolute sensor data found.")
+            return pd.DataFrame()
+
+        # Flatten absolute data
+        df_flat = pd.DataFrame(absolute_data)
+        df_flat = df_flat.rename(columns={"xValue": "timestamp", "yValue": "value"})
+        df_flat["timestamp"] = pd.to_datetime(df_flat["timestamp"])
+
+        print(df_flat.head())
+        return df_flat
+
     else:
         raise Exception(f"Error fetching readings: HTTP {response.status_code} - {response.text}")
 
@@ -113,13 +124,21 @@ if __name__ == "__main__":
         sites = list_sites_from_org(org_data)
         print("Available Sites:")
         for site in sites:
-            print(f" - {site['farm']} / {site['name']} (siteId: {site['siteId']}, id: {site['id']})")
+            print(f" - {site['farm']} / {site['name']} (siteId: {site['siteId']}, twigId: {site['twigId']})")
 
         if not sites:
             print("No sites found.")
             sys.exit(0)
 
         selected_site = input("Enter a siteId to fetch readings: ").strip()
+        matching_sites = [s for s in sites if str(s["siteId"]) == selected_site]
+        if not matching_sites:
+            print("SiteId not found.")
+            sys.exit(1)
+
+        twig_id = matching_sites[0]["twigId"]
+        print(f"Using twigId (deviceId): {twig_id}")
+
         start_str = input("Enter start date (YYYY-MM-DD): ").strip()
         end_str = input("Enter end date (YYYY-MM-DD): ").strip()
 
@@ -132,7 +151,7 @@ if __name__ == "__main__":
             print(f"Invalid date format: {ve}")
             sys.exit(1)
 
-        df = get_readings(token, selected_site, from_date, to_date)
+        df = get_readings(token, selected_site, twig_id, from_date, to_date)
 
     except Exception as e:
         print(f"Error: {e}")
