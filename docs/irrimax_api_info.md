@@ -4,36 +4,31 @@ This table documents the meaning of column headers returned by the IrriMAX Live 
 
 ---
 
-## General Columns
+### IrriMAX Live DataFrame Column Definitions
 
-| Column        | Description                                               |
-|---------------|-----------------------------------------------------------|
-| `Date Time`   | Timestamp of the sensor reading (in local site time)      |
-| `V1`, `V2`    | Voltage readings from the probe (often supply or upload)  |
+| Column     | Description                                                                 |
+|------------|-----------------------------------------------------------------------------|
+| `Date`     | Date of the reading (`YYYY/MM/DD`)                                           |
+| `Time`     | Time of the reading (`HH:MM:SS`)                                             |
+| `V1`       | Voltage input 1 (e.g., battery or power source)                              |
+| `V2`       | Voltage input 2 (optional or secondary input)                                |
+| `A1(5)`    | Volumetric Water Content (VWC) at 5 cm depth, in %                          |
+| `S1(5)`    | Soil Electrical Conductivity at 5 cm depth, in µS/cm                         |
+| `T1(5)`    | Soil Temperature at 5 cm depth, in °C                                        |
+| `A2(15)`   | VWC at 15 cm depth                                                           |
+| `S2(15)`   | Soil EC at 15 cm depth                                                       |
+| `T2(15)`   | Temperature at 15 cm depth                                                   |
+| ...        | Pattern continues for additional depths (e.g., 30, 45, 60, ... cm)           |
+| `A9(85)`   | VWC at 85 cm depth                                                           |
+| `S9(85)`   | Soil EC at 85 cm depth                                                       |
+| `T9(85)`   | Temperature at 85 cm depth                                                   |
 
----
+ **Notes:**
+ - `A` = Volumetric Water Content (VWC), in percent (%)
+ - `S` = Specific Conductivity, in microSiemens per centimeter (µS/cm)
+ - `T` = Temperature, in degrees Celsius (°C)
+ - The number in parentheses indicates the sensor depth in centimeters
 
-## Depth-Specific Sensor Columns
-
-Sensor columns are structured as `<Type><Index>(<Depth>)`, for example, `A3(25)` means the third moisture sensor at 25 cm depth.
-
-| Prefix | Sensor Type                              | Units            | Notes                                 |
-|--------|------------------------------------------|------------------|---------------------------------------|
-| `A`    | Soil Moisture (Volumetric Water Content) | %                | Based on depth (e.g., `A1(5)`)        |
-| `S`    | Soil Salinity (Electrical Conductivity)  | µS/cm            | Based on depth (e.g., `S1(5)`)        |
-| `T`    | Soil Temperature                         | °C               | Based on depth (e.g., `T1(5)`)        |
-| `V`    | Voltage                                  | Volts (V)        | System voltages, not tied to depth    |
-
----
-
-## Example
-
-| Column     | Meaning                                  |
-|------------|-------------------------------------------|
-| `A3(25)`   | Moisture reading at 25 cm depth           |
-| `S3(25)`   | Salinity reading at 25 cm depth           |
-| `T3(25)`   | Temperature reading at 25 cm depth        |
-| `V1`       | Probe voltage supply or battery level     |
 
 ---
 
