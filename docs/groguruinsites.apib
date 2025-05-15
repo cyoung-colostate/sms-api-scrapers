@@ -1,0 +1,3444 @@
+FORMAT: 1A
+HOST: https://api.groguru.com/
+
+# GroGuru InSites
+
+GroGuru InSites API allows consumer to retrieve Site data.
+
+## Authentication [/user/signin]
+
+This section describes how to create a new session to obtain sessionToken and userid.
+sessionToken is used to authenticate API requests.
+userid is used in other api calls.
+
+### Signin [POST /user/signin]
+
+This request is used to create a new session. A sessionToken is returned on success.
+
++ Request (application/json)
+
+        {
+            "email": "GroGuru Demo",
+            "password": "groguru"
+        }
+
++ Response 200 (application/json)
+
+        {
+          "status": 200,
+          "data": {
+            "id": "wxYezloszG",
+            "sessionToken": "r:d4b47c128f3379cf690b9eeccf47601d",
+            "username": "GroGuru Demo",
+            "role": "dealer_user",
+            "type": "login"
+          },
+          "message": "User logged in successfully",
+          "success": true
+        }
+
+## Data [/]
+
+This section describes how to access account data.
+
+### Get Orgnization View [GET /org/view/{userid}/]
+
+This request is used to get organization details such as Dealers, Businesses, Farms and Sites.
+
++ Request
+
+    + Headers
+
+            Authorization : "r:d4b47c128f3379cf690b9eeccf47601d"
+
+    + Parameters
+        + userid (string, required) - data.id from signin api response
+        
++ Response 200 (application/json)
+
+        {
+          "status": 200,
+          "data": {
+            "invitedToEmail": "grogurudemo@groguru.com",
+            "type": "dealer",
+            "name": "GroGuru Demo",
+            "status": "INVITATION_ACCEPTED",
+            "invitedBy": {
+              "objectId": "Et4Ic9Jw8K"
+            },
+            "parentId": null,
+            "createdAt": "2020-11-24T05:03:44.258Z",
+            "objectId": "9nlZ5ps9Hc",
+            "reportingStatus": [
+              {
+                "status": "FAIR",
+                "count": 6
+              },
+              {
+                "status": "LOW",
+                "count": 0
+              },
+              {
+                "status": "MED",
+                "count": 0
+              },
+              {
+                "status": "NOT_CONNECTED",
+                "count": 0
+              }
+            ],
+            "children": [
+              {
+                "invitedToEmail": "grogurudemobiz@gro.guru",
+                "type": "business",
+                "name": "GroGuru demo",
+                "status": "INVITATION_ACCEPTED",
+                "invitedBy": {
+                  "objectId": "wxYezloszG"
+                },
+                "parentId": "9nlZ5ps9Hc",
+                "createdAt": "2020-11-24T05:07:07.960Z",
+                "objectId": "5A6frp8GXK",
+                "reportingStatus": [
+                  {
+                    "status": "FAIR",
+                    "count": 6
+                  },
+                  {
+                    "status": "LOW",
+                    "count": 0
+                  },
+                  {
+                    "status": "MED",
+                    "count": 0
+                  },
+                  {
+                    "status": "NOT_CONNECTED",
+                    "count": 0
+                  }
+                ],
+                "children": [
+                  {
+                    "location": {
+                      "__type": "GeoPoint",
+                      "latitude": 31.9685988,
+                      "longitude": -99.9018131
+                    },
+                    "createdBy": {
+                      "objectId": "wxYezloszG"
+                    },
+                    "physicalAddress": "Winters, TX 79567, USA",
+                    "name": "demo",
+                    "mailingAddress": "Texas",
+                    "status": "PENDING",
+                    "parentId": "5A6frp8GXK",
+                    "createdAt": "2020-11-24T05:07:50.394Z",
+                    "weather": [
+                      {
+                        "weekdayName": "F",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "93/73",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_ne.png",
+                        "windMaxMin": "6/2",
+                        "precip": 0.09,
+                        "precipProb": 55,
+                        "et": 0.16
+                      },
+                      {
+                        "weekdayName": "S",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "85/73",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_nne.png",
+                        "windMaxMin": "4/1",
+                        "precip": 0.72,
+                        "precipProb": 70,
+                        "et": 0.07
+                      },
+                      {
+                        "weekdayName": "S",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "87/70",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_se.png",
+                        "windMaxMin": "5/2",
+                        "precip": 0.41,
+                        "precipProb": 70,
+                        "et": 0.1
+                      },
+                      {
+                        "weekdayName": "M",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "81/71",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_ese.png",
+                        "windMaxMin": "5/2",
+                        "precip": 1.07,
+                        "precipProb": 70,
+                        "et": 0.08
+                      },
+                      {
+                        "weekdayName": "T",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "86/69",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_se.png",
+                        "windMaxMin": "7/2",
+                        "precip": 0.35,
+                        "precipProb": 69.2,
+                        "et": 0.1
+                      },
+                      {
+                        "weekdayName": "W",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "88/70",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_se.png",
+                        "windMaxMin": "6/3",
+                        "precip": 0.22,
+                        "precipProb": 65.1,
+                        "et": 0.12
+                      },
+                      {
+                        "weekdayName": "T",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "88/70",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_sse.png",
+                        "windMaxMin": "9/3",
+                        "precip": 0.2,
+                        "precipProb": 70,
+                        "et": 0.14
+                      }
+                    ],
+                    "objectId": "CDAmRTgVrC",
+                    "moistureState": [
+                      {
+                        "value": "HIGH",
+                        "count": 1
+                      },
+                      {
+                        "value": "FAIR",
+                        "count": 5
+                      },
+                      {
+                        "value": "MED",
+                        "count": 0
+                      },
+                      {
+                        "value": "LOW",
+                        "count": 0
+                      }
+                    ],
+                    "reportingStatus": [
+                      {
+                        "status": "FAIR",
+                        "count": 6
+                      },
+                      {
+                        "status": "LOW",
+                        "count": 0
+                      },
+                      {
+                        "status": "MED",
+                        "count": 0
+                      },
+                      {
+                        "status": "NOT_CONNECTED",
+                        "count": 0
+                      }
+                    ],
+                    "moistureStateWithSites": [
+                      {
+                        "siteId": "10243",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10244",
+                        "state": "HIGH"
+                      },
+                      {
+                        "siteId": "10245",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10246",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10249",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10250",
+                        "state": "FAIR"
+                      }
+                    ],
+                    "reportingStatusWithSites": [
+                      {
+                        "siteId": "10243",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10244",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10245",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10246",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10249",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10250",
+                        "status": "FAIR"
+                      }
+                    ],
+                    "sites": [
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 36.002428,
+                          "longitude": -101.989365
+                        },
+                        "gId": "858W2226+X7C",
+                        "siteId": "10243",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T05:10:52.586Z",
+                        "baseStationId": "0x",
+                        "twigId": "0x574e3643430c4e5c",
+                        "cropTemplate": {
+                          "objectId": "4u6V25kGLo"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Cotton-Corn TX (Pivot)",
+                        "id": "LZ5BRG4Arj"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 35.998142,
+                          "longitude": -101.982246
+                        },
+                        "gId": "853WX2X9+742",
+                        "siteId": "10244",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T05:25:36.111Z",
+                        "baseStationId": "0x684e404141632e63",
+                        "twigId": "0x574e364343654e5c",
+                        "cropTemplate": {
+                          "objectId": "AZhKq1dyzc"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Corn-Cotton TX (Pivot)",
+                        "id": "nwDXKb7PLX"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 37.610516,
+                          "longitude": -99.682971
+                        },
+                        "gId": "8692J868+6R2",
+                        "siteId": "10245",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T07:00:47.775Z",
+                        "baseStationId": "0x6e4e404141182e76",
+                        "twigId": "0x224e6331314d7e33",
+                        "cropTemplate": {
+                          "objectId": "AZhKq1dyzc"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Soybean KS (Pivot)",
+                        "id": "1phbkju1im"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 37.581771,
+                          "longitude": -99.647291
+                        },
+                        "gId": "8692H9J3+P34",
+                        "siteId": "10246",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T07:04:17.622Z",
+                        "baseStationId": "0x",
+                        "twigId": "0x524e364343674e59",
+                        "cropTemplate": {
+                          "objectId": "iNed4fd0gn"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Corn KS (Pivot)",
+                        "id": "6IvZwRBCa1"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 38.548799,
+                          "longitude": -97.768682
+                        },
+                        "gId": "86C4G6XJ+GG8",
+                        "siteId": "10249",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T08:14:39.763Z",
+                        "baseStationId": "0x684e404141212e63",
+                        "twigId": "0x684e404141022e70",
+                        "cropTemplate": {
+                          "objectId": "AZhKq1dyzc"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Soybean KS (Drip)",
+                        "id": "J3nA3UXw6g"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 38.545913,
+                          "longitude": -97.766671
+                        },
+                        "gId": "86C4G6WM+988",
+                        "siteId": "10250",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T08:22:56.144Z",
+                        "baseStationId": "0x",
+                        "twigId": "0x694e404141172e71",
+                        "cropTemplate": {
+                          "objectId": "iNed4fd0gn"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Corn KS (Drip)",
+                        "id": "AjAd0eLES2"
+                      }
+                    ],
+                    "children": []
+                  }
+                ]
+              }
+            ],
+            "otherEntities": [],
+            "directBusinessEntities": [
+              {
+                "invitedToEmail": "grogurudemobiz@gro.guru",
+                "type": "business",
+                "name": "GroGuru demo",
+                "status": "INVITATION_ACCEPTED",
+                "invitedBy": {
+                  "objectId": "wxYezloszG"
+                },
+                "parentId": "9nlZ5ps9Hc",
+                "createdAt": "2020-11-24T05:07:07.960Z",
+                "objectId": "5A6frp8GXK",
+                "reportingStatus": [
+                  {
+                    "status": "FAIR",
+                    "count": 6
+                  },
+                  {
+                    "status": "LOW",
+                    "count": 0
+                  },
+                  {
+                    "status": "MED",
+                    "count": 0
+                  },
+                  {
+                    "status": "NOT_CONNECTED",
+                    "count": 0
+                  }
+                ],
+                "children": [
+                  {
+                    "location": {
+                      "__type": "GeoPoint",
+                      "latitude": 31.9685988,
+                      "longitude": -99.9018131
+                    },
+                    "createdBy": {
+                      "objectId": "wxYezloszG"
+                    },
+                    "physicalAddress": "Winters, TX 79567, USA",
+                    "name": "demo",
+                    "mailingAddress": "Texas",
+                    "status": "PENDING",
+                    "parentId": "5A6frp8GXK",
+                    "createdAt": "2020-11-24T05:07:50.394Z",
+                    "weather": [
+                      {
+                        "weekdayName": "F",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "93/73",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_ne.png",
+                        "windMaxMin": "6/2",
+                        "precip": 0.09,
+                        "precipProb": 55,
+                        "et": 0.16
+                      },
+                      {
+                        "weekdayName": "S",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "85/73",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_nne.png",
+                        "windMaxMin": "4/1",
+                        "precip": 0.72,
+                        "precipProb": 70,
+                        "et": 0.07
+                      },
+                      {
+                        "weekdayName": "S",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "87/70",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_se.png",
+                        "windMaxMin": "5/2",
+                        "precip": 0.41,
+                        "precipProb": 70,
+                        "et": 0.1
+                      },
+                      {
+                        "weekdayName": "M",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "81/71",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_ese.png",
+                        "windMaxMin": "5/2",
+                        "precip": 1.07,
+                        "precipProb": 70,
+                        "et": 0.08
+                      },
+                      {
+                        "weekdayName": "T",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "86/69",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_se.png",
+                        "windMaxMin": "7/2",
+                        "precip": 0.35,
+                        "precipProb": 69.2,
+                        "et": 0.1
+                      },
+                      {
+                        "weekdayName": "W",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "88/70",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_se.png",
+                        "windMaxMin": "6/3",
+                        "precip": 0.22,
+                        "precipProb": 65.1,
+                        "et": 0.12
+                      },
+                      {
+                        "weekdayName": "T",
+                        "weatherDesc": "http://icons.clearapis.com/en-us/style1/v1/128/precip_thunderstorm.png",
+                        "tempMaxMin": "88/70",
+                        "windDir": "http://icons.clearapis.com/en-us/style1/v1/128/direction_sse.png",
+                        "windMaxMin": "9/3",
+                        "precip": 0.2,
+                        "precipProb": 70,
+                        "et": 0.14
+                      }
+                    ],
+                    "objectId": "CDAmRTgVrC",
+                    "moistureState": [
+                      {
+                        "value": "HIGH",
+                        "count": 1
+                      },
+                      {
+                        "value": "FAIR",
+                        "count": 5
+                      },
+                      {
+                        "value": "MED",
+                        "count": 0
+                      },
+                      {
+                        "value": "LOW",
+                        "count": 0
+                      }
+                    ],
+                    "reportingStatus": [
+                      {
+                        "status": "FAIR",
+                        "count": 6
+                      },
+                      {
+                        "status": "LOW",
+                        "count": 0
+                      },
+                      {
+                        "status": "MED",
+                        "count": 0
+                      },
+                      {
+                        "status": "NOT_CONNECTED",
+                        "count": 0
+                      }
+                    ],
+                    "moistureStateWithSites": [
+                      {
+                        "siteId": "10243",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10244",
+                        "state": "HIGH"
+                      },
+                      {
+                        "siteId": "10245",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10246",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10249",
+                        "state": "FAIR"
+                      },
+                      {
+                        "siteId": "10250",
+                        "state": "FAIR"
+                      }
+                    ],
+                    "reportingStatusWithSites": [
+                      {
+                        "siteId": "10243",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10244",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10245",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10246",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10249",
+                        "status": "FAIR"
+                      },
+                      {
+                        "siteId": "10250",
+                        "status": "FAIR"
+                      }
+                    ],
+                    "sites": [
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 36.002428,
+                          "longitude": -101.989365
+                        },
+                        "gId": "858W2226+X7C",
+                        "siteId": "10243",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T05:10:52.586Z",
+                        "baseStationId": "0x",
+                        "twigId": "0x574e3643430c4e5c",
+                        "cropTemplate": {
+                          "objectId": "4u6V25kGLo"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Cotton-Corn TX (Pivot)",
+                        "id": "LZ5BRG4Arj"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 35.998142,
+                          "longitude": -101.982246
+                        },
+                        "gId": "853WX2X9+742",
+                        "siteId": "10244",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T05:25:36.111Z",
+                        "baseStationId": "0x684e404141632e63",
+                        "twigId": "0x574e364343654e5c",
+                        "cropTemplate": {
+                          "objectId": "AZhKq1dyzc"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Corn-Cotton TX (Pivot)",
+                        "id": "nwDXKb7PLX"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 37.610516,
+                          "longitude": -99.682971
+                        },
+                        "gId": "8692J868+6R2",
+                        "siteId": "10245",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T07:00:47.775Z",
+                        "baseStationId": "0x6e4e404141182e76",
+                        "twigId": "0x224e6331314d7e33",
+                        "cropTemplate": {
+                          "objectId": "AZhKq1dyzc"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Soybean KS (Pivot)",
+                        "id": "1phbkju1im"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 37.581771,
+                          "longitude": -99.647291
+                        },
+                        "gId": "8692H9J3+P34",
+                        "siteId": "10246",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T07:04:17.622Z",
+                        "baseStationId": "0x",
+                        "twigId": "0x524e364343674e59",
+                        "cropTemplate": {
+                          "objectId": "iNed4fd0gn"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Corn KS (Pivot)",
+                        "id": "6IvZwRBCa1"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 38.548799,
+                          "longitude": -97.768682
+                        },
+                        "gId": "86C4G6XJ+GG8",
+                        "siteId": "10249",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T08:14:39.763Z",
+                        "baseStationId": "0x684e404141212e63",
+                        "twigId": "0x684e404141022e70",
+                        "cropTemplate": {
+                          "objectId": "AZhKq1dyzc"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Soybean KS (Drip)",
+                        "id": "J3nA3UXw6g"
+                      },
+                      {
+                        "location": {
+                          "__type": "GeoPoint",
+                          "latitude": 38.545913,
+                          "longitude": -97.766671
+                        },
+                        "gId": "86C4G6WM+988",
+                        "siteId": "10250",
+                        "status": "ACTIVE",
+                        "notes": "",
+                        "farm": {
+                          "objectId": "CDAmRTgVrC"
+                        },
+                        "createdAt": "2020-11-24T08:22:56.144Z",
+                        "baseStationId": "0x",
+                        "twigId": "0x694e404141172e71",
+                        "cropTemplate": {
+                          "objectId": "iNed4fd0gn"
+                        },
+                        "planDetails": {
+                          "plan": "Gold"
+                        },
+                        "name": "Corn KS (Drip)",
+                        "id": "AjAd0eLES2"
+                      }
+                    ],
+                    "children": []
+                  }
+                ]
+              }
+            ]
+          },
+          "message": "Data populated successfully",
+          "success": true
+        }
+
+
+### Get Graph Data [GET /stem/graph-data/{siteId}/{deviceId}/?fromDate={fromDate}&toDate={toDate}]
+
+This request is used to fetch sensor data of a Site with siteId, deviceId 
+for a given date range between fromDate and toDate. 
+
++ Request 
+
+    + Headers
+
+            Authorization : "r:d4b47c128f3379cf690b9eeccf47601d"
+        
+    + Parameters
+        + stemId (string, required) - ID of the Site 
+        + deviceId (string, required) - ID of the Device (Fox/Stem)
+        + fromDate (optional) - start of date range
+        + toDate (optional) - end of date range
+        
++ Response 200 (application/json)
+
+        {
+          "status": 200,
+          "data": {
+            "siteDetails": {
+              "settings": {
+                "localSensorLocation": {
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Sensor Depth (inches)",
+                  "sensorType": "groguru",
+                  "value": {
+                    "referenceDepth": [
+                      6
+                    ],
+                    "sensors": [
+                      {
+                        "deepSensor1": {
+                          "depthOffset": 0,
+                          "name": "Top"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "x_volwatcontRP": {
+                  "count": 6,
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture Refill Points",
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "0": 40
+                    },
+                    {
+                      "1": 45
+                    },
+                    {
+                      "2": 50
+                    },
+                    {
+                      "3": 55
+                    },
+                    {
+                      "4": 60
+                    },
+                    {
+                      "5": 60
+                    }
+                  ]
+                },
+                "x_volwatcontWL2": {
+                  "count": 6,
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture Optimal Limits",
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "0": 99
+                    },
+                    {
+                      "1": 99
+                    },
+                    {
+                      "2": 99
+                    },
+                    {
+                      "3": 99
+                    },
+                    {
+                      "4": 99
+                    },
+                    {
+                      "5": 99
+                    }
+                  ]
+                },
+                "plantType": {
+                  "parseClass": "PlantType",
+                  "value": "Soybean",
+                  "inputType": "select",
+                  "label": "Crop Type"
+                },
+                "siteName": {
+                  "label": "Site Name",
+                  "parseClass": "SiteName",
+                  "siteId": "6IvZwRBCa1",
+                  "value": "Corn KS (Pivot)",
+                  "hasUser": true,
+                  "inputType": "text"
+                },
+                "hardwareType": {
+                  "label": "Hardware Type",
+                  "type": "badger",
+                  "parseClass": "HardwareType",
+                  "hardwareId": "P9PXFX6v8U",
+                  "value": "40\" AquaCheck(6 sensors)",
+                  "inputType": "select"
+                },
+                "addLocalSensor": {
+                  "inputType": "checkbox",
+                  "label": "Add Local Sensor",
+                  "value": "true"
+                },
+                "hardwareSensorLocation": {
+                  "count": 6,
+                  "inputType": "numberArray",
+                  "label": "Sensor Depth (inches)",
+                  "sensorType": "aquacheck",
+                  "value": {
+                    "sensors": [
+                      {
+                        "0": {
+                          "name": "1",
+                          "depthOffset": 4
+                        },
+                        "1": {
+                          "name": "2",
+                          "depthOffset": 8
+                        },
+                        "2": {
+                          "name": "3",
+                          "depthOffset": 16
+                        },
+                        "3": {
+                          "name": "4",
+                          "depthOffset": 24
+                        },
+                        "4": {
+                          "name": "5",
+                          "depthOffset": 32
+                        },
+                        "5": {
+                          "name": "6",
+                          "depthOffset": 40
+                        }
+                      }
+                    ],
+                    "referenceDepth": [
+                      12
+                    ]
+                  }
+                },
+                "hardwareSensorCount": {
+                  "inputType": "number",
+                  "label": "Hardware Sensor Count",
+                  "value": 6
+                },
+                "irrigationType": {
+                  "inputType": "select",
+                  "label": "Irrigation Type",
+                  "parseClass": "IrrigationType",
+                  "value": "Center Pivot"
+                },
+                "x_volwatcontMin_local": {
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Soil Moisture PWP Limits",
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "deepSensor1": 15
+                    }
+                  ]
+                },
+                "x_volwatcontWL_local": {
+                  "userEdited": false,
+                  "value": [
+                    {
+                      "Value (%)": "60"
+                    }
+                  ],
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Soil Moisture Warning Limit"
+                },
+                "soilType": {
+                  "inputType": "select",
+                  "label": "Soil Type",
+                  "parseClass": "SoilType",
+                  "value": "Sandy Loam"
+                },
+                "localSensor": {
+                  "inputType": "select",
+                  "label": "Type of Local Sensor",
+                  "type": "fox",
+                  "parseClass": "HardwareType",
+                  "hardwareId": "RoSvEgagJe",
+                  "value": "GroGuru Sensor"
+                },
+                "x_volwatcontWL1": {
+                  "count": 6,
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture Warning Limits",
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "0": 50
+                    },
+                    {
+                      "1": 55
+                    },
+                    {
+                      "2": 60
+                    },
+                    {
+                      "3": 65
+                    },
+                    {
+                      "4": 70
+                    },
+                    {
+                      "5": 70
+                    }
+                  ]
+                },
+                "x_volwatcontMax_local": {
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "deepSensor1": 50
+                    }
+                  ],
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Soil Moisture FC Limits"
+                },
+                "x_volwatcontRP_local": {
+                  "label": "Local Soil Moisture Refill Points",
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "deepSensor1": 30
+                    }
+                  ],
+                  "count": 1,
+                  "inputType": "numberArray"
+                },
+                "rootDepth": {
+                  "inputType": "number",
+                  "label": "Current Root Depth",
+                  "value": 20,
+                  "rootImage": "TapThinRoot1",
+                  "plantImage": "Soybean8R2"
+                },
+                "installByDate": {
+                  "inputType": "date",
+                  "label": "Install By Date",
+                  "value": "05/19/2020"
+                },
+                "x_volwatcontWL": {
+                  "userEdited": false,
+                  "value": [
+                    {
+                      "Value (%)": "60"
+                    }
+                  ],
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture Warning Limit"
+                },
+                "x_volwatcontWL1_local": {
+                  "value": [
+                    {
+                      "deepSensor1": 40
+                    }
+                  ],
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Soil Moisture Warning Limits",
+                  "userEdited": true
+                },
+                "x_volwatcontRL_local": {
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Soil Moisture Refill Limit",
+                  "userEdited": false,
+                  "value": [
+                    {
+                      "Value (%)": "50"
+                    }
+                  ]
+                },
+                "localSensorCount": {
+                  "inputType": "number",
+                  "label": "Local Sensor Count",
+                  "value": 1
+                },
+                "maxIrrigationVolume": {
+                  "inputType": "number",
+                  "label": "Max Irrigation Volume (in Gallons)",
+                  "value": 100
+                },
+                "x_volwatcontMin": {
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture PWP Limits",
+                  "userEdited": true,
+                  "value": [
+                    {
+                      "0": 25
+                    },
+                    {
+                      "1": 25
+                    },
+                    {
+                      "2": 32
+                    },
+                    {
+                      "3": 30
+                    },
+                    {
+                      "4": 24
+                    },
+                    {
+                      "5": 20
+                    }
+                  ],
+                  "count": 6
+                },
+                "x_volwatcontRL": {
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture Refill Limit",
+                  "userEdited": false,
+                  "value": [
+                    {
+                      "Value (%)": "50"
+                    }
+                  ]
+                },
+                "distanceFromWaterSource": {
+                  "inputType": "number",
+                  "label": "Distance of Site from Water Source (feet)",
+                  "value": 100
+                },
+                "plantingDate": {
+                  "inputType": "date",
+                  "label": "Planting Date",
+                  "value": "05/15/2021"
+                },
+                "irrigationPercolation": {
+                  "inputType": "number",
+                  "label": "Irrigation Reach",
+                  "value": 3,
+                  "date": "2021-06-29T12:00:00.000Z"
+                },
+                "reportingInterval": {
+                  "inputType": "number",
+                  "unit": "sec",
+                  "label": "Reporting Interval",
+                  "value": 2000
+                },
+                "x_volwatcontMax": {
+                  "value": [
+                    {
+                      "0": 45.4
+                    },
+                    {
+                      "1": 45.8
+                    },
+                    {
+                      "2": 52.33
+                    },
+                    {
+                      "3": 50
+                    },
+                    {
+                      "4": 44.6
+                    },
+                    {
+                      "5": 40.2
+                    }
+                  ],
+                  "count": 6,
+                  "inputType": "numberArray",
+                  "label": "Soil Moisture FC Limits",
+                  "userEdited": true
+                },
+                "x_volwatcontWL2_local": {
+                  "value": [
+                    {
+                      "deepSensor1": 80
+                    }
+                  ],
+                  "count": 1,
+                  "inputType": "numberArray",
+                  "label": "Local Soil Moisture Optimal Limits",
+                  "userEdited": true
+                },
+                "predictedWaterUse": [
+                  {
+                    "forecastDay": 1,
+                    "forecastValue": "0.08",
+                    "display": true
+                  },
+                  {
+                    "forecastDay": 2,
+                    "forecastValue": "0.20",
+                    "display": false
+                  },
+                  {
+                    "forecastDay": 3,
+                    "forecastValue": "0.32",
+                    "display": true
+                  },
+                  {
+                    "forecastDay": 4,
+                    "forecastValue": "0.44",
+                    "display": false
+                  },
+                  {
+                    "forecastDay": 5,
+                    "forecastValue": "0.57",
+                    "display": false
+                  },
+                  {
+                    "forecastDay": 6,
+                    "forecastValue": "0.70",
+                    "display": false
+                  },
+                  {
+                    "forecastDay": 7,
+                    "forecastValue": "0.87",
+                    "display": false
+                  },
+                  {
+                    "forecastDay": 8,
+                    "forecastValue": "1.06",
+                    "display": false
+                  },
+                  {
+                    "forecastDay": 9,
+                    "forecastValue": "1.27",
+                    "display": true
+                  }
+                ],
+                "rainfallDataSource": {
+                  "type": "DTN"
+                },
+                "dtnDetails": {
+                  "fieldId": "0575161f-2c97-427f-94d6-8d3cf9e8d1ed",
+                  "plantType": "Soybean",
+                  "plantingDate": "05/15/2021",
+                  "growthId": "ad0b74a6-0dd5-4b80-b267-ca2d16589f48",
+                  "nextGrowthStage": "R3",
+                  "nextGrowthStageDate": "2021-07-09T00:00:00.000Z",
+                  "irrigationType": 2,
+                  "isPredictedWaterSaved": "yes"
+                },
+                "irrigationProperties": {
+                  "system_type": 2,
+                  "flow_rate": 500,
+                  "flow_rate_unit": "gpm",
+                  "irrigated_area": 120,
+                  "irrigated_area_unit": "ac",
+                  "nozzle_type": 0
+                }
+              },
+              "location": {
+                "__type": "GeoPoint",
+                "latitude": 37.581771,
+                "longitude": -99.647291
+              },
+              "type": "sensor",
+              "siteId": "10246",
+              "isEnabled": false,
+              "locationName": "Corn KS (Pivot)",
+              "createdAt": "2020-11-24T07:04:17.658Z",
+              "updatedAt": "2021-07-02T18:02:49.046Z",
+              "badgerId": "0x00227039541f386a",
+              "twigId": "0x524e364343674e59",
+              "details": {
+                "lastUpdated": "2021-07-02T19:26:29.000Z",
+                "connectionStatus": "http://52.88.146.67:4445/phant/5db14b313db24c8629027da3?pagesize=1&hal=c&sort=-timestamp",
+                "data": {
+                  "volwatcont_local": {
+                    "sort_order": 2,
+                    "Unit": "%",
+                    "label": "Local Soil Moisture",
+                    "multivalue_ordered": [
+                      {
+                        "deepSensor1": 2.8601269721984863
+                      }
+                    ],
+                    "value": 0
+                  },
+                  "salinity_local": {
+                    "value": 0,
+                    "sort_order": 4,
+                    "Unit": "dS/m",
+                    "label": "Local Salinity",
+                    "multivalue_ordered": [
+                      {
+                        "deepSensor1": 121.44308550349311
+                      }
+                    ]
+                  },
+                  "temp_f_local": {
+                    "sort_order": 3,
+                    "Unit": "F",
+                    "label": "Local Soil Temperature",
+                    "multivalue_ordered": [
+                      {
+                        "deepSensor1": 76.60746765136719
+                      }
+                    ],
+                    "value": 0
+                  },
+                  "conductivity_local": {
+                    "sort_order": 5,
+                    "Unit": "dS/m",
+                    "label": "Local EC",
+                    "multivalue_ordered": [
+                      {
+                        "deepSensor1": 1.3577749729156494
+                      }
+                    ],
+                    "value": 0
+                  },
+                  "rssi": {
+                    "Unit": "dBm",
+                    "label": "RSSI",
+                    "value": -111,
+                    "sort_order": 11
+                  },
+                  "moisture": {
+                    "sort_order": 2,
+                    "Unit": "%",
+                    "label": "Soil Moisture",
+                    "multivalue_ordered": [
+                      {
+                        "0": 68.5958480834961
+                      },
+                      {
+                        "1": 80.8974380493164
+                      },
+                      {
+                        "2": 87.97924041748047
+                      },
+                      {
+                        "3": 86.26984405517578
+                      },
+                      {
+                        "4": 81.56898498535156
+                      },
+                      {
+                        "5": 74.24298095703125
+                      }
+                    ],
+                    "value": 0
+                  },
+                  "v_bandgap": {
+                    "sort_order": 10,
+                    "Unit": "V",
+                    "label": "Battery",
+                    "value": 2.2297223734349485,
+                    "max_value": 3,
+                    "min_value": 2.2
+                  },
+                  "aw": {
+                    "sort_order": 1,
+                    "Unit": "%",
+                    "label": "Available Water",
+                    "value": 0
+                  },
+                  "temp_f": {
+                    "sort_order": 3,
+                    "Unit": "F",
+                    "label": "Soil Temperature",
+                    "multivalue_ordered": [
+                      {
+                        "0": 73.76000213623047
+                      },
+                      {
+                        "1": 73.04000091552734
+                      },
+                      {
+                        "2": 72.31999969482422
+                      },
+                      {
+                        "3": 70.87999725341797
+                      },
+                      {
+                        "4": 69.08000183105469
+                      },
+                      {
+                        "5": 67.27999877929688
+                      }
+                    ],
+                    "value": 0
+                  }
+                }
+              },
+              "properties": {},
+              "objectId": "FJ8JI8WRFC"
+            },
+            "graph": {
+              "volwatcont_local": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "deepSensor1": 2.9
+                  }
+                ],
+                "relative": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "deepSensor1": -34.57
+                  }
+                ]
+              },
+              "salinity_local": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "deepSensor1": 5
+                  }
+                ],
+                "relative": []
+              },
+              "temp_f_local": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "deepSensor1": 76.607
+                  }
+                ],
+                "relative": []
+              },
+              "conductivity_local": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "deepSensor1": 1.358
+                  }
+                ],
+                "relative": []
+              },
+              "rssi": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "yValue": -111
+                  },
+                  {
+                    "xValue": "2021-07-02T17:15:00.000Z",
+                    "yValue": -113
+                  },
+                  {
+                    "xValue": "2021-07-02T12:45:00.000Z",
+                    "yValue": -115
+                  },
+                  {
+                    "xValue": "2021-07-02T12:15:00.000Z",
+                    "yValue": -115
+                  },
+                  {
+                    "xValue": "2021-07-02T11:45:00.000Z",
+                    "yValue": -113
+                  },
+                  {
+                    "xValue": "2021-07-02T08:15:00.000Z",
+                    "yValue": -113
+                  },
+                  {
+                    "xValue": "2021-07-02T02:45:00.000Z",
+                    "yValue": -115
+                  },
+                  {
+                    "xValue": "2021-07-02T01:15:00.000Z",
+                    "yValue": -115
+                  },
+                  {
+                    "xValue": "2021-07-01T22:00:00.000Z",
+                    "yValue": -114
+                  },
+                  {
+                    "xValue": "2021-07-01T21:30:00.000Z",
+                    "yValue": -114
+                  },
+                  {
+                    "xValue": "2021-07-01T20:00:00.000Z",
+                    "yValue": -114
+                  }
+                ],
+                "relative": []
+              },
+              "moisture": {
+                "absolute": [
+                  {
+                    "0": 33.7,
+                    "1": 42.8,
+                    "2": 49.9,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T19:15:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.9,
+                    "2": 49.9,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T17:15:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.9,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T12:45:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.9,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T12:15:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.9,
+                    "2": 50,
+                    "3": 48.1,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T11:45:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.9,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T08:15:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.9,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T02:45:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.8,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-02T01:15:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.8,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-01T22:00:00.000Z"
+                  },
+                  {
+                    "0": 33.7,
+                    "1": 42.8,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-01T21:30:00.000Z"
+                  },
+                  {
+                    "0": 33.6,
+                    "1": 42.8,
+                    "2": 50,
+                    "3": 48,
+                    "4": 43.4,
+                    "5": 37.5,
+                    "xValue": "2021-07-01T20:00:00.000Z"
+                  }
+                ],
+                "relative": [
+                  {
+                    "0": 42.65,
+                    "1": 85.58,
+                    "2": 88.05,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T19:15:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 86.06,
+                    "2": 88.05,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T17:15:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 86.06,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T12:45:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 86.06,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T12:15:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 86.06,
+                    "2": 88.54,
+                    "3": 90.5,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T11:45:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 86.06,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T08:15:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 86.06,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T02:45:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 85.58,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-02T01:15:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 85.58,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-01T22:00:00.000Z"
+                  },
+                  {
+                    "0": 42.65,
+                    "1": 85.58,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-01T21:30:00.000Z"
+                  },
+                  {
+                    "0": 42.16,
+                    "1": 85.58,
+                    "2": 88.54,
+                    "3": 90,
+                    "4": 94.17,
+                    "5": 86.63,
+                    "xValue": "2021-07-01T20:00:00.000Z"
+                  }
+                ]
+              },
+              "v_bandgap": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "yValue": 2.23
+                  },
+                  {
+                    "xValue": "2021-07-02T17:15:00.000Z",
+                    "yValue": 2.23
+                  },
+                  {
+                    "xValue": "2021-07-02T12:45:00.000Z",
+                    "yValue": 2.22
+                  },
+                  {
+                    "xValue": "2021-07-02T12:15:00.000Z",
+                    "yValue": 2.22
+                  },
+                  {
+                    "xValue": "2021-07-02T11:45:00.000Z",
+                    "yValue": 2.22
+                  },
+                  {
+                    "xValue": "2021-07-02T08:15:00.000Z",
+                    "yValue": 2.22
+                  },
+                  {
+                    "xValue": "2021-07-02T02:45:00.000Z",
+                    "yValue": 2.22
+                  },
+                  {
+                    "xValue": "2021-07-02T01:15:00.000Z",
+                    "yValue": 2.23
+                  },
+                  {
+                    "xValue": "2021-07-01T22:00:00.000Z",
+                    "yValue": 2.23
+                  },
+                  {
+                    "xValue": "2021-07-01T21:30:00.000Z",
+                    "yValue": 2.23
+                  },
+                  {
+                    "xValue": "2021-07-01T20:00:00.000Z",
+                    "yValue": 2.23
+                  }
+                ],
+                "relative": []
+              },
+              "aw": {
+                "absolute": [
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.43,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "total": 7.41
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.43,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T17:15:00.000Z",
+                    "total": 7.41
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T12:45:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T12:15:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.45,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T11:45:00.000Z",
+                    "total": 7.43
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T08:15:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T02:45:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-02T01:15:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-01T22:00:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-01T21:30:00.000Z",
+                    "total": 7.42
+                  },
+                  {
+                    "0": 0.52,
+                    "1": 1.07,
+                    "2": 1.44,
+                    "3": 1.44,
+                    "4": 1.55,
+                    "5": 1.4,
+                    "xValue": "2021-07-01T20:00:00.000Z",
+                    "total": 7.42
+                  }
+                ],
+                "relative": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "yValue": 82.69
+                  },
+                  {
+                    "xValue": "2021-07-02T17:15:00.000Z",
+                    "yValue": 82.72
+                  },
+                  {
+                    "xValue": "2021-07-02T12:45:00.000Z",
+                    "yValue": 82.82
+                  },
+                  {
+                    "xValue": "2021-07-02T12:15:00.000Z",
+                    "yValue": 82.83
+                  },
+                  {
+                    "xValue": "2021-07-02T11:45:00.000Z",
+                    "yValue": 82.89
+                  },
+                  {
+                    "xValue": "2021-07-02T08:15:00.000Z",
+                    "yValue": 82.84
+                  },
+                  {
+                    "xValue": "2021-07-02T02:45:00.000Z",
+                    "yValue": 82.81
+                  },
+                  {
+                    "xValue": "2021-07-02T01:15:00.000Z",
+                    "yValue": 82.75
+                  },
+                  {
+                    "xValue": "2021-07-01T22:00:00.000Z",
+                    "yValue": 82.72
+                  },
+                  {
+                    "xValue": "2021-07-01T21:30:00.000Z",
+                    "yValue": 82.74
+                  },
+                  {
+                    "xValue": "2021-07-01T20:00:00.000Z",
+                    "yValue": 82.74
+                  }
+                ]
+              },
+              "temp_f": {
+                "absolute": [
+                  {
+                    "0": 73.76,
+                    "1": 73.04,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T19:15:00.000Z"
+                  },
+                  {
+                    "0": 73.76,
+                    "1": 73.04,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T17:15:00.000Z"
+                  },
+                  {
+                    "0": 73.76,
+                    "1": 73.04,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T12:45:00.000Z"
+                  },
+                  {
+                    "0": 73.76,
+                    "1": 73.04,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T12:15:00.000Z"
+                  },
+                  {
+                    "0": 73.76,
+                    "1": 73.04,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T11:45:00.000Z"
+                  },
+                  {
+                    "0": 74.12,
+                    "1": 73.4,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T08:15:00.000Z"
+                  },
+                  {
+                    "0": 74.12,
+                    "1": 73.4,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T02:45:00.000Z"
+                  },
+                  {
+                    "0": 74.12,
+                    "1": 73.4,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-02T01:15:00.000Z"
+                  },
+                  {
+                    "0": 74.12,
+                    "1": 73.4,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-01T22:00:00.000Z"
+                  },
+                  {
+                    "0": 74.12,
+                    "1": 73.4,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-01T21:30:00.000Z"
+                  },
+                  {
+                    "0": 74.12,
+                    "1": 73.4,
+                    "2": 72.32,
+                    "3": 70.88,
+                    "4": 69.08,
+                    "5": 67.28,
+                    "xValue": "2021-07-01T20:00:00.000Z"
+                  }
+                ],
+                "relative": []
+              },
+              "aw_local": {
+                "absolute": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "deepSensor1": 0
+                  }
+                ],
+                "relative": [
+                  {
+                    "xValue": "2021-07-02T19:15:00.000Z",
+                    "yValue": 66.94
+                  },
+                  {
+                    "xValue": "2021-07-02T17:15:00.000Z",
+                    "yValue": 82.72
+                  },
+                  {
+                    "xValue": "2021-07-02T12:45:00.000Z",
+                    "yValue": 82.82
+                  },
+                  {
+                    "xValue": "2021-07-02T12:15:00.000Z",
+                    "yValue": 82.83
+                  },
+                  {
+                    "xValue": "2021-07-02T11:45:00.000Z",
+                    "yValue": 82.89
+                  },
+                  {
+                    "xValue": "2021-07-02T08:15:00.000Z",
+                    "yValue": 82.84
+                  },
+                  {
+                    "xValue": "2021-07-02T02:45:00.000Z",
+                    "yValue": 82.81
+                  },
+                  {
+                    "xValue": "2021-07-02T01:15:00.000Z",
+                    "yValue": 82.75
+                  },
+                  {
+                    "xValue": "2021-07-01T22:00:00.000Z",
+                    "yValue": 82.72
+                  },
+                  {
+                    "xValue": "2021-07-01T21:30:00.000Z",
+                    "yValue": 82.74
+                  },
+                  {
+                    "xValue": "2021-07-01T20:00:00.000Z",
+                    "yValue": 82.74
+                  }
+                ]
+              },
+              "gddEnvelope": {
+                "absolute": [
+                  {
+                    "xValue": "2021-05-15T00:00:00.000Z",
+                    "agdd": 14.19,
+                    "agddEnvelopeMin": 15.46,
+                    "agddEnvelopeMax": 15.46,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-16T00:00:00.000Z",
+                    "agdd": 29.64,
+                    "agddEnvelopeMin": 22.4024,
+                    "agddEnvelopeMax": 34.5768,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-17T00:00:00.000Z",
+                    "agdd": 43.98,
+                    "agddEnvelopeMin": 28.6221,
+                    "agddEnvelopeMax": 52.0503,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-18T00:00:00.000Z",
+                    "agdd": 56.97,
+                    "agddEnvelopeMin": 34.9307,
+                    "agddEnvelopeMax": 71.391,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-19T00:00:00.000Z",
+                    "agdd": 70.78,
+                    "agddEnvelopeMin": 40.5152,
+                    "agddEnvelopeMax": 85.755,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-20T00:00:00.000Z",
+                    "agdd": 85.1,
+                    "agddEnvelopeMin": 49.2119,
+                    "agddEnvelopeMax": 98.715,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-21T00:00:00.000Z",
+                    "agdd": 101.43,
+                    "agddEnvelopeMin": 62.5173,
+                    "agddEnvelopeMax": 112.99,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-22T00:00:00.000Z",
+                    "agdd": 120.06,
+                    "agddEnvelopeMin": 70.3327,
+                    "agddEnvelopeMax": 132.005,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-23T00:00:00.000Z",
+                    "agdd": 135.76,
+                    "agddEnvelopeMin": 78.9227,
+                    "agddEnvelopeMax": 153.185,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-24T00:00:00.000Z",
+                    "agdd": 150.82,
+                    "agddEnvelopeMin": 89.5377,
+                    "agddEnvelopeMax": 170.435,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-25T00:00:00.000Z",
+                    "agdd": 167.55,
+                    "agddEnvelopeMin": 103.193,
+                    "agddEnvelopeMax": 192.5,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-26T00:00:00.000Z",
+                    "agdd": 184.9,
+                    "agddEnvelopeMin": 117.204,
+                    "agddEnvelopeMax": 217.03,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-27T00:00:00.000Z",
+                    "agdd": 198.23,
+                    "agddEnvelopeMin": 132.455,
+                    "agddEnvelopeMax": 237.64,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-28T00:00:00.000Z",
+                    "agdd": 208.72,
+                    "agddEnvelopeMin": 148.475,
+                    "agddEnvelopeMax": 254.829,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-29T00:00:00.000Z",
+                    "agdd": 219.25,
+                    "agddEnvelopeMin": 163.225,
+                    "agddEnvelopeMax": 273.783,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-30T00:00:00.000Z",
+                    "agdd": 226.75,
+                    "agddEnvelopeMin": 173.859,
+                    "agddEnvelopeMax": 292.578,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-05-31T00:00:00.000Z",
+                    "agdd": 235.89,
+                    "agddEnvelopeMin": 185.685,
+                    "agddEnvelopeMax": 313.181,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-01T00:00:00.000Z",
+                    "agdd": 247.8,
+                    "agddEnvelopeMin": 201.211,
+                    "agddEnvelopeMax": 337.324,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-02T00:00:00.000Z",
+                    "agdd": 260.75,
+                    "agddEnvelopeMin": 220.722,
+                    "agddEnvelopeMax": 354.107,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-03T00:00:00.000Z",
+                    "agdd": 276.34,
+                    "agddEnvelopeMin": 241.807,
+                    "agddEnvelopeMax": 369.712,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-04T00:00:00.000Z",
+                    "agdd": 293.77,
+                    "agddEnvelopeMin": 262.004,
+                    "agddEnvelopeMax": 389.323,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-05T00:00:00.000Z",
+                    "agdd": 310.79,
+                    "agddEnvelopeMin": 282.388,
+                    "agddEnvelopeMax": 409.807,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-06T00:00:00.000Z",
+                    "agdd": 328.24,
+                    "agddEnvelopeMin": 302.931,
+                    "agddEnvelopeMax": 432.794,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-07T00:00:00.000Z",
+                    "agdd": 347.1,
+                    "agddEnvelopeMin": 324.257,
+                    "agddEnvelopeMax": 451.582,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-08T00:00:00.000Z",
+                    "agdd": 366.36,
+                    "agddEnvelopeMin": 343.895,
+                    "agddEnvelopeMax": 472.968,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-09T00:00:00.000Z",
+                    "agdd": 388,
+                    "agddEnvelopeMin": 363.972,
+                    "agddEnvelopeMax": 496.865,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-10T00:00:00.000Z",
+                    "agdd": 412.07,
+                    "agddEnvelopeMin": 386.495,
+                    "agddEnvelopeMax": 524.276,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-11T00:00:00.000Z",
+                    "agdd": 434.08,
+                    "agddEnvelopeMin": 407.419,
+                    "agddEnvelopeMax": 547.995,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-12T00:00:00.000Z",
+                    "agdd": 456.02,
+                    "agddEnvelopeMin": 421.312,
+                    "agddEnvelopeMax": 571.002,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-13T00:00:00.000Z",
+                    "agdd": 478.56,
+                    "agddEnvelopeMin": 436.702,
+                    "agddEnvelopeMax": 593.65,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-14T00:00:00.000Z",
+                    "agdd": 500.43,
+                    "agddEnvelopeMin": 454.499,
+                    "agddEnvelopeMax": 618.259,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-15T00:00:00.000Z",
+                    "agdd": 522.81,
+                    "agddEnvelopeMin": 471.387,
+                    "agddEnvelopeMax": 643.324,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-16T00:00:00.000Z",
+                    "agdd": 545.78,
+                    "agddEnvelopeMin": 487.398,
+                    "agddEnvelopeMax": 666.59,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-17T00:00:00.000Z",
+                    "agdd": 569.86,
+                    "agddEnvelopeMin": 504.549,
+                    "agddEnvelopeMax": 690.038,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-18T00:00:00.000Z",
+                    "agdd": 594.89,
+                    "agddEnvelopeMin": 523.937,
+                    "agddEnvelopeMax": 714.14,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-19T00:00:00.000Z",
+                    "agdd": 619.7,
+                    "agddEnvelopeMin": 543.075,
+                    "agddEnvelopeMax": 736.644,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-20T00:00:00.000Z",
+                    "agdd": 643.79,
+                    "agddEnvelopeMin": 562.824,
+                    "agddEnvelopeMax": 755.421,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-21T00:00:00.000Z",
+                    "agdd": 659.37,
+                    "agddEnvelopeMin": 586.115,
+                    "agddEnvelopeMax": 774.237,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-22T00:00:00.000Z",
+                    "agdd": 676.27,
+                    "agddEnvelopeMin": 603.094,
+                    "agddEnvelopeMax": 792.841,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-23T00:00:00.000Z",
+                    "agdd": 699.75,
+                    "agddEnvelopeMin": 618.895,
+                    "agddEnvelopeMax": 811.07,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-24T00:00:00.000Z",
+                    "agdd": 725.69,
+                    "agddEnvelopeMin": 634.217,
+                    "agddEnvelopeMax": 828.254,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-25T00:00:00.000Z",
+                    "agdd": 748.15,
+                    "agddEnvelopeMin": 654.477,
+                    "agddEnvelopeMax": 845.316,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-26T00:00:00.000Z",
+                    "agdd": 766.82,
+                    "agddEnvelopeMin": 674.802,
+                    "agddEnvelopeMax": 867.525,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-27T00:00:00.000Z",
+                    "agdd": 785.35,
+                    "agddEnvelopeMin": 697.586,
+                    "agddEnvelopeMax": 891.748,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-28T00:00:00.000Z",
+                    "agdd": 803.1,
+                    "agddEnvelopeMin": 720.837,
+                    "agddEnvelopeMax": 916.16,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-29T00:00:00.000Z",
+                    "agdd": 821.09,
+                    "agddEnvelopeMin": 743.695,
+                    "agddEnvelopeMax": 940.754,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-06-30T00:00:00.000Z",
+                    "agdd": 840.66,
+                    "agddEnvelopeMin": 766.157,
+                    "agddEnvelopeMax": 964.085,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-01T00:00:00.000Z",
+                    "agdd": 857.82,
+                    "agddEnvelopeMin": 786.43,
+                    "agddEnvelopeMax": 983.409,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-02T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 808.003,
+                    "agddEnvelopeMax": 1005.04,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-03T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 829.053,
+                    "agddEnvelopeMax": 1028.99,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-04T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 851.729,
+                    "agddEnvelopeMax": 1052.52,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-05T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 875.342,
+                    "agddEnvelopeMax": 1074.93,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-06T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 894.886,
+                    "agddEnvelopeMax": 1097.28,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-07T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 913.836,
+                    "agddEnvelopeMax": 1117.98,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-08T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 930.974,
+                    "agddEnvelopeMax": 1138.41,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-09T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 948.036,
+                    "agddEnvelopeMax": 1160.01,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-10T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 967.494,
+                    "agddEnvelopeMax": 1181.69,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-11T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 989.887,
+                    "agddEnvelopeMax": 1204.39,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-12T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1013.97,
+                    "agddEnvelopeMax": 1228.31,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-13T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1037.36,
+                    "agddEnvelopeMax": 1251.31,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-14T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1057.72,
+                    "agddEnvelopeMax": 1272.83,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-15T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1080.3,
+                    "agddEnvelopeMax": 1300.64,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-16T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1103.65,
+                    "agddEnvelopeMax": 1329.06,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-17T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1129.4,
+                    "agddEnvelopeMax": 1355.54,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-18T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1155.62,
+                    "agddEnvelopeMax": 1382,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-19T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1182.15,
+                    "agddEnvelopeMax": 1409.95,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-20T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1206.77,
+                    "agddEnvelopeMax": 1438.91,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-21T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1225.61,
+                    "agddEnvelopeMax": 1464.78,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-22T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1245.23,
+                    "agddEnvelopeMax": 1490.22,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-23T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1266.72,
+                    "agddEnvelopeMax": 1517.84,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-24T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1284.24,
+                    "agddEnvelopeMax": 1544.16,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-25T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1304.65,
+                    "agddEnvelopeMax": 1568.03,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-26T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1325.81,
+                    "agddEnvelopeMax": 1593.53,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-27T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1347.19,
+                    "agddEnvelopeMax": 1623.37,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-28T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1372.38,
+                    "agddEnvelopeMax": 1649.22,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-29T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1393.69,
+                    "agddEnvelopeMax": 1673.19,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-30T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1416.61,
+                    "agddEnvelopeMax": 1697.3,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-07-31T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1442.83,
+                    "agddEnvelopeMax": 1723.74,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-01T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1464.03,
+                    "agddEnvelopeMax": 1750.97,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-02T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1485.12,
+                    "agddEnvelopeMax": 1779.59,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-03T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1504.13,
+                    "agddEnvelopeMax": 1805.07,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-04T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1525.07,
+                    "agddEnvelopeMax": 1829.37,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-05T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1546.61,
+                    "agddEnvelopeMax": 1853.31,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-06T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1569.74,
+                    "agddEnvelopeMax": 1881.94,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-07T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1591.49,
+                    "agddEnvelopeMax": 1907.64,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-08T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1610.22,
+                    "agddEnvelopeMax": 1932.69,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-09T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1630.88,
+                    "agddEnvelopeMax": 1954.71,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-10T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1649.76,
+                    "agddEnvelopeMax": 1975.66,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-11T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1669.09,
+                    "agddEnvelopeMax": 1997.25,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-12T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1686.96,
+                    "agddEnvelopeMax": 2021.62,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-13T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1707.22,
+                    "agddEnvelopeMax": 2041.46,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-14T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1728.5,
+                    "agddEnvelopeMax": 2062.47,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-15T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1750.06,
+                    "agddEnvelopeMax": 2086.88,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-16T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1770.33,
+                    "agddEnvelopeMax": 2112.76,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-17T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1788.74,
+                    "agddEnvelopeMax": 2136.03,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-18T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1810.2,
+                    "agddEnvelopeMax": 2161.56,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-19T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1828.97,
+                    "agddEnvelopeMax": 2188.82,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-20T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1843.35,
+                    "agddEnvelopeMax": 2209.28,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-21T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1857.62,
+                    "agddEnvelopeMax": 2230.97,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-22T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1878.83,
+                    "agddEnvelopeMax": 2255.37,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-23T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1892.12,
+                    "agddEnvelopeMax": 2282.18,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-24T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1906.2,
+                    "agddEnvelopeMax": 2309.56,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-25T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1923.91,
+                    "agddEnvelopeMax": 2333.12,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-26T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1945.6,
+                    "agddEnvelopeMax": 2357.01,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-27T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1968.5,
+                    "agddEnvelopeMax": 2379.7,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-28T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 1989.76,
+                    "agddEnvelopeMax": 2405.6,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-29T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2006.41,
+                    "agddEnvelopeMax": 2428.4,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-30T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2022.51,
+                    "agddEnvelopeMax": 2452.19,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-08-31T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2042.36,
+                    "agddEnvelopeMax": 2477.34,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-01T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2065.3,
+                    "agddEnvelopeMax": 2505.15,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-02T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2088.44,
+                    "agddEnvelopeMax": 2530.33,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-03T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2112.17,
+                    "agddEnvelopeMax": 2550.32,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-04T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2135.3,
+                    "agddEnvelopeMax": 2564.39,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-05T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2152.99,
+                    "agddEnvelopeMax": 2578.27,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-06T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2165.52,
+                    "agddEnvelopeMax": 2594.01,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-07T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2182.28,
+                    "agddEnvelopeMax": 2611.12,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-08T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2202.53,
+                    "agddEnvelopeMax": 2626.91,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-09T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2220.67,
+                    "agddEnvelopeMax": 2639.81,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-10T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2238.52,
+                    "agddEnvelopeMax": 2654.53,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-11T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2256.5,
+                    "agddEnvelopeMax": 2671.95,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-12T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2274.49,
+                    "agddEnvelopeMax": 2693.83,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-13T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2293.02,
+                    "agddEnvelopeMax": 2713.22,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-14T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2314.86,
+                    "agddEnvelopeMax": 2726.1,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-15T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2333.43,
+                    "agddEnvelopeMax": 2731.54,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-16T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2348.54,
+                    "agddEnvelopeMax": 2741.62,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-17T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2369.4,
+                    "agddEnvelopeMax": 2756.03,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-18T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2388.81,
+                    "agddEnvelopeMax": 2770.67,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-19T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2407.7,
+                    "agddEnvelopeMax": 2786.97,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-20T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2427.64,
+                    "agddEnvelopeMax": 2802.33,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-21T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2443.99,
+                    "agddEnvelopeMax": 2814.01,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-22T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2457.44,
+                    "agddEnvelopeMax": 2826.59,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-23T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2475.97,
+                    "agddEnvelopeMax": 2841.12,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-24T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2493.73,
+                    "agddEnvelopeMax": 2859.73,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-25T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2510.91,
+                    "agddEnvelopeMax": 2871.63,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-26T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2527.46,
+                    "agddEnvelopeMax": 2885.1,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-27T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2544.25,
+                    "agddEnvelopeMax": 2900.28,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-28T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2558.55,
+                    "agddEnvelopeMax": 2920.42,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-29T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2569.85,
+                    "agddEnvelopeMax": 2934.07,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-09-30T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2585.57,
+                    "agddEnvelopeMax": 2944.99,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-01T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2601.64,
+                    "agddEnvelopeMax": 2957.07,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-02T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2620.75,
+                    "agddEnvelopeMax": 2972.59,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-03T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2627.25,
+                    "agddEnvelopeMax": 2991.22,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-04T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2637.37,
+                    "agddEnvelopeMax": 3009.1,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-05T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2648.54,
+                    "agddEnvelopeMax": 3024.13,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-06T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2660.31,
+                    "agddEnvelopeMax": 3038.47,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-07T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2672.41,
+                    "agddEnvelopeMax": 3056.82,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-08T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2687.68,
+                    "agddEnvelopeMax": 3069.79,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-09T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2698.74,
+                    "agddEnvelopeMax": 3076.03,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-10T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2711.77,
+                    "agddEnvelopeMax": 3083.44,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-11T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2717.6,
+                    "agddEnvelopeMax": 3094.84,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-12T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2725.2,
+                    "agddEnvelopeMax": 3106.88,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-13T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2733.22,
+                    "agddEnvelopeMax": 3117.36,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-14T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2741.9,
+                    "agddEnvelopeMax": 3126.74,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-15T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2752.85,
+                    "agddEnvelopeMax": 3138.4,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-16T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2765.78,
+                    "agddEnvelopeMax": 3146.9,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-17T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2775.52,
+                    "agddEnvelopeMax": 3153.3,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-18T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2782.94,
+                    "agddEnvelopeMax": 3157.11,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-19T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2795.02,
+                    "agddEnvelopeMax": 3160.26,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-20T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2807.7,
+                    "agddEnvelopeMax": 3165.95,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-21T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2823.28,
+                    "agddEnvelopeMax": 3176.27,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-22T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2835.42,
+                    "agddEnvelopeMax": 3186.42,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-23T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2849.09,
+                    "agddEnvelopeMax": 3197.92,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-24T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2859.66,
+                    "agddEnvelopeMax": 3211.07,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-25T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2862.79,
+                    "agddEnvelopeMax": 3224.75,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-26T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2862.79,
+                    "agddEnvelopeMax": 3227.66,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-27T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2862.79,
+                    "agddEnvelopeMax": 3227.83,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-28T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2862.79,
+                    "agddEnvelopeMax": 3230.79,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-29T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2866.1,
+                    "agddEnvelopeMax": 3237.41,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-30T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2872.74,
+                    "agddEnvelopeMax": 3243,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-10-31T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2880.79,
+                    "agddEnvelopeMax": 3252.75,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-01T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2883.43,
+                    "agddEnvelopeMax": 3261.92,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-02T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2892.07,
+                    "agddEnvelopeMax": 3262.75,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-03T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2898.18,
+                    "agddEnvelopeMax": 3262.75,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-04T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3265.1,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-05T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3271.04,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-06T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3273.98,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-07T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3273.98,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-08T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3273.98,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-09T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3274.29,
+                    "agddEnvelopeAvg": null
+                  },
+                  {
+                    "xValue": "2021-11-10T00:00:00.000Z",
+                    "agdd": null,
+                    "agddEnvelopeMin": 2900.73,
+                    "agddEnvelopeMax": 3276.71,
+                    "agddEnvelopeAvg": null
+                  }
+                ],
+                "relative": [],
+                "stageData": [
+                  {
+                    "xValue": "2021-05-21T00:00:00.000Z",
+                    "stageName": "RA"
+                  },
+                  {
+                    "xValue": "2021-05-25T00:00:00.000Z",
+                    "stageName": "VE"
+                  },
+                  {
+                    "xValue": "2021-06-05T00:00:00.000Z",
+                    "stageName": "VC"
+                  },
+                  {
+                    "xValue": "2021-06-09T00:00:00.000Z",
+                    "stageName": "V1"
+                  },
+                  {
+                    "xValue": "2021-06-12T00:00:00.000Z",
+                    "stageName": "V2"
+                  },
+                  {
+                    "xValue": "2021-06-16T00:00:00.000Z",
+                    "stageName": "V3"
+                  },
+                  {
+                    "xValue": "2021-06-19T00:00:00.000Z",
+                    "stageName": "V4"
+                  },
+                  {
+                    "xValue": "2021-06-23T00:00:00.000Z",
+                    "stageName": "V5"
+                  },
+                  {
+                    "xValue": "2021-06-27T00:00:00.000Z",
+                    "stageName": "V6"
+                  },
+                  {
+                    "xValue": "2021-06-28T00:00:00.000Z",
+                    "stageName": "R1"
+                  },
+                  {
+                    "xValue": "2021-07-02T00:00:00.000Z",
+                    "stageName": "R2"
+                  },
+                  {
+                    "xValue": "2021-07-09T00:00:00.000Z",
+                    "stageName": "R3"
+                  },
+                  {
+                    "xValue": "2021-07-13T00:00:00.000Z",
+                    "stageName": "R3.5"
+                  },
+                  {
+                    "xValue": "2021-07-16T00:00:00.000Z",
+                    "stageName": "R4"
+                  },
+                  {
+                    "xValue": "2021-07-22T00:00:00.000Z",
+                    "stageName": "R5"
+                  },
+                  {
+                    "xValue": "2021-08-13T00:00:00.000Z",
+                    "stageName": "R6"
+                  },
+                  {
+                    "xValue": "2021-08-31T00:00:00.000Z",
+                    "stageName": "R7"
+                  },
+                  {
+                    "xValue": "2021-09-12T00:00:00.000Z",
+                    "stageName": "R8"
+                  }
+                ]
+              }
+            }
+          },
+          "message": "Data populated successfully",
+          "success": true
+        }

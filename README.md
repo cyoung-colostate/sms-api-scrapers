@@ -70,7 +70,52 @@ python code/irrimax_scraper.py \
   --logger "Soybeans 1" \
   --days-back 7
 ```
-The script prints the first few rows of the returned DataFrame; saving to CSV / DB is optional and can be added downstream.
+The script prints the first few rows of the returned DataFrame
+
+### 4.3 • Example Usage on a Linux Server (Automated Cloud Deployment)
+
+Your `irrimax_scraper.py` script supports both interactive use and programmatic importing. For cloud deployment (e.g., using `cron`), you can create a simple runner script to automate daily data pulls.
+
+> [!IMPORTANT] 
+> Be sure your config.py file is properly populated and present in the same directory or Python path when the script runs.
+
+#### 4.3.1 • IrriMAX Live via `get_readings()`
+
+To automate data ingestion:
+
+1. **Create a runner script (e.g., `daily_pull.py`):**
+
+```python
+from irrimax_scraper import get_readings
+import datetime
+import pandas as pd
+
+# Define logger and time window
+logger_name = "Soybeans 1"
+to_date = datetime.datetime.utcnow()
+from_date = to_date - datetime.timedelta(days=1)
+
+# Fetch and save data
+df = get_readings(logger_name, from_date, to_date)
+
+if not df.empty:
+    out_path = f"/home/user/data/{logger_name.replace(' ', '_')}_{from_date:%Y%m%d}.csv"
+    df.to_csv(out_path, index=False)
+```
+
+2. Add the task to your crontab (`crontab -e`):
+
+```cron
+0 3 * * * /usr/bin/python3 /home/user/scripts/daily_pull.py >> /home/user/logs/irrimax.log 2>&1
+```
+
+This will:
+
+- Run the script every day at 3:00 AM
+
+- Save a CSV to /home/user/data/
+
+- Log all output and errors to /home/user/logs/irrimax.log
 
 ## 5 • Common Features
 
