@@ -30,6 +30,7 @@ ORG_VIEW_ENDPOINT = f"{BASE_URL}/org/view/{{user_id}}"
 GRAPH_DATA_ENDPOINT = f"{BASE_URL}/stem/graph-data/{{siteId}}/{{deviceId}}/"
 
 def authenticate(email, password):
+    """Authenticate with the GroGuru API and return a token and user ID."""
     print("Authenticating with GroGuru API...")
     payload = {"email": email, "password": password}
     response = requests.post(LOGIN_ENDPOINT, json=payload)
@@ -47,6 +48,7 @@ def authenticate(email, password):
         sys.exit(1)
 
 def get_organization_view(token, userid):
+    """Retrieve the organization view data for the authenticated user."""
     print("Fetching organization view...")
     headers = {"Authorization": token}
     response = requests.get(ORG_VIEW_ENDPOINT.format(user_id=userid), headers=headers)
@@ -63,6 +65,7 @@ def get_organization_view(token, userid):
     return None
 
 def list_sites_from_org(org_data):
+    """Flatten and extract site and device information from organization data."""
     site_dict = {}
     try:
         for farm in org_data.get("children", []):
@@ -81,6 +84,7 @@ def list_sites_from_org(org_data):
     return list(site_dict.values())
 
 def flatten_graph_data(graph):
+    """Flatten the nested graph JSON data into a flat DataFrame."""
     all_data = {}
     for key, content in graph.items():
         abs_data = content.get("absolute")
@@ -102,8 +106,8 @@ def flatten_graph_data(graph):
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     return df
 
-def get_readings(token, site_id, device_id, from_date, to_date):
-    print(f"Fetching readings for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
+def get_raw_json(token, site_id, device_id, from_date, to_date):
+    """Fetch raw JSON data from the GroGuru API for a given site and device."""
     headers = {"Authorization": token}
     params = {
         "fromDate": from_date.strftime("%Y-%m-%d"),
@@ -112,22 +116,25 @@ def get_readings(token, site_id, device_id, from_date, to_date):
     }
     url = f"{BASE_URL}/stem/graph-data/{site_id}/{device_id}/"
     response = requests.get(url, headers=headers, params=params)
-
     if response.status_code == 200:
-        json_data = response.json()
-        graph_data = json_data.get("data", {}).get("graph", {})
-        if not graph_data:
-            print("No graph data returned.")
-            return pd.DataFrame()
-
-        df_flat = flatten_graph_data(graph_data)
-        print(df_flat.head())
-        return df_flat
-
+        return response.json()
     else:
-        raise Exception(f"Error fetching readings: HTTP {response.status_code} - {response.text}")
+        raise Exception(f"Error fetching raw JSON: HTTP {response.status_code} - {response.text}")
+
+def get_readings(token, site_id, device_id, from_date, to_date):
+    """Fetch flattened sensor readings DataFrame for a site/device/date range."""
+    print(f"Fetching readings for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
+    json_data = get_raw_json(token, site_id, device_id, from_date, to_date)
+    graph_data = json_data.get("data", {}).get("graph", {})
+    if not graph_data:
+        print("No graph data returned.")
+        return pd.DataFrame()
+    df_flat = flatten_graph_data(graph_data)
+    print(df_flat.head())
+    return df_flat
 
 def get_brute_force_readings(token, site_id, device_id, from_date, to_date, step_hours=2):
+    """Repeatedly call `get_readings` over 2-hour intervals to overcome data limits."""
     print(f"Brute force fetching from {from_date} to {to_date} in {step_hours}-hour chunks...")
     delta = datetime.timedelta(hours=step_hours)
     current_start = from_date
@@ -156,62 +163,3 @@ def get_brute_force_readings(token, site_id, device_id, from_date, to_date, step
 
     print(f"Retrieved {len(merged_df)} rows total.")
     return merged_df
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="GroGuru Data Fetcher")
-    parser.add_argument("--site", type=str, help="Site ID", required=False)
-    parser.add_argument("--start", type=str, help="Start date (YYYY-MM-DD)", required=False)
-    parser.add_argument("--end", type=str, help="End date (YYYY-MM-DD)", required=False)
-    args = parser.parse_args()
-
-    try:
-        token, userid = authenticate(GROGURU_EMAIL, GROGURU_PASSWORD)
-        org_data = get_organization_view(token, userid)
-        sites = list_sites_from_org(org_data)
-
-        if not sites:
-            print("No sites found.")
-            sys.exit(0)
-
-        if args.site and args.start and args.end:
-            selected_site_id = args.site
-            matching_sites = [s for s in sites if str(s["siteId"]) == selected_site_id]
-            if not matching_sites:
-                print("SiteId not found.")
-                sys.exit(1)
-            twig_id = matching_sites[0]["devices"][0]
-            from_date = datetime.datetime.strptime(args.start, "%Y-%m-%d")
-            to_date = datetime.datetime.strptime(args.end, "%Y-%m-%d")
-            df = get_brute_force_readings(token, selected_site_id, twig_id, from_date, to_date)
-            print(df.head())
-
-        else:
-            print("Available Sites:")
-            for site in sites:
-                print(f" - {site['farm']} / {site['name']} (siteId: {site['siteId']})")
-
-            selected_site_id = input("Enter a siteId to fetch readings: ").strip()
-            matching_sites = [s for s in sites if str(s["siteId"]) == selected_site_id]
-            if not matching_sites:
-                print("SiteId not found.")
-                sys.exit(1)
-
-            twig_id = matching_sites[0]["devices"][0]
-            print(f"Using twigId (deviceId): {twig_id}")
-            start_str = input("Enter start date (YYYY-MM-DD): ").strip()
-            end_str = input("Enter end date (YYYY-MM-DD): ").strip()
-
-            try:
-                from_date = datetime.datetime.strptime(start_str, "%Y-%m-%d")
-                to_date = datetime.datetime.strptime(end_str, "%Y-%m-%d")
-                if from_date > to_date:
-                    raise ValueError("Start date must be before end date.")
-            except ValueError as ve:
-                print(f"Invalid date format: {ve}")
-                sys.exit(1)
-
-            df = get_brute_force_readings(token, selected_site_id, twig_id, from_date, to_date)
-            print(df.head())
-
-    except Exception as e:
-        print(f"Error: {e}")
