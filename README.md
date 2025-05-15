@@ -66,9 +66,24 @@ pip install -r requirements.txt
 
 ### 4.2 Run a scrape (IrriMAX example)
 ```bash
-python code/irrimax_scraper.py \
-  --logger "Soybeans 1" \
-  --days-back 7
+>python irrimax_scraper.py
+Choose an option:
+1. List available loggers
+2. Fetch readings for a specific logger
+Enter 1 or 2: 2
+Enter logger name (case-sensitive): 8A_8
+Enter start date (YYYY-MM-DD): 2024-06-10
+Enter end date (YYYY-MM-DD): 2024-10-15
+
+Fetching data for logger: 8A_8 (2024-06-10 to 2024-10-15)...
+             Date Time      V1      V2     A1(5)     S1(5)  ...    S8(75)    T8(75)    A9(85)    S9(85)  T9(85)
+0  2024/06/10 00:00:00  13.735  13.474  16.63106  379.6608  ...  844.3812  17.04999  40.48423  4438.727   16.72
+1  2024/06/10 00:30:00  13.769  -1.000  16.62494  376.4792  ...  844.4537  17.04999  40.48423  4438.727   16.72
+2  2024/06/10 01:00:00  13.787  -1.000  16.62494  378.4209  ...  844.3812  17.01999  40.49162  4439.438   16.72
+3  2024/06/10 01:30:00  13.783  -1.000  16.58220  373.6646  ...  844.0801  16.95001  40.46944  4437.237   16.75
+4  2024/06/10 02:00:00  13.707  -1.000  16.60052  373.4932  ...  844.3039  17.00000  40.49162  4422.122   16.72
+
+[5 rows x 30 columns]
 ```
 The script prints the first few rows of the returned DataFrame
 
