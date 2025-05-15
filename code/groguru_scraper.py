@@ -15,6 +15,7 @@ import requests
 import datetime
 import pandas as pd
 import sys
+import argparse
 from io import StringIO
 import config  # Contains GROGURU_EMAIL and GROGURU_PASSWORD
 
@@ -27,7 +28,6 @@ BASE_URL = "https://api.groguru.com"
 LOGIN_ENDPOINT = f"{BASE_URL}/user/signin"
 ORG_VIEW_ENDPOINT = f"{BASE_URL}/org/view/{{user_id}}"
 GRAPH_DATA_ENDPOINT = f"{BASE_URL}/stem/graph-data/{{siteId}}/{{deviceId}}/"
-
 
 def authenticate(email, password):
     print("Authenticating with GroGuru API...")
@@ -46,7 +46,6 @@ def authenticate(email, password):
         print(f"Login failed. HTTP {response.status_code} - {response.text}")
         sys.exit(1)
 
-
 def get_organization_view(token, userid):
     print("Fetching organization view...")
     headers = {"Authorization": token}
@@ -63,23 +62,23 @@ def get_organization_view(token, userid):
         print(f"Failed to get organization view. HTTP {response.status_code} - {response.text}")
     return None
 
-
 def list_sites_from_org(org_data):
-    sites = []
+    site_dict = {}
     try:
         for farm in org_data.get("children", []):
             for site in farm.get("sites", []):
-                sites.append({
-                    "farm": farm.get("name"),
-                    "name": site.get("name"),
-                    "siteId": site.get("siteId"),
-                    "id": site.get("id"),
-                    "twigId": site.get("twigId")
-                })
+                site_id = site.get("siteId")
+                if site_id not in site_dict:
+                    site_dict[site_id] = {
+                        "farm": farm.get("name"),
+                        "name": site.get("name"),
+                        "siteId": site_id,
+                        "devices": []
+                    }
+                site_dict[site_id]["devices"].append(site.get("twigId"))
     except KeyError:
         print("Unexpected format in org view response.")
-    return sites
-
+    return list(site_dict.values())
 
 def flatten_graph_data(graph):
     all_data = {}
@@ -103,13 +102,13 @@ def flatten_graph_data(graph):
     df["timestamp"] = pd.to_datetime(df["timestamp"])
     return df
 
-
 def get_readings(token, site_id, device_id, from_date, to_date):
     print(f"Fetching readings for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
     headers = {"Authorization": token}
     params = {
         "fromDate": from_date.strftime("%Y-%m-%d"),
-        "toDate": to_date.strftime("%Y-%m-%d")
+        "toDate": to_date.strftime("%Y-%m-%d"),
+        "limit": 1000
     }
     url = f"{BASE_URL}/stem/graph-data/{site_id}/{device_id}/"
     response = requests.get(url, headers=headers, params=params)
@@ -128,43 +127,91 @@ def get_readings(token, site_id, device_id, from_date, to_date):
     else:
         raise Exception(f"Error fetching readings: HTTP {response.status_code} - {response.text}")
 
+def get_brute_force_readings(token, site_id, device_id, from_date, to_date, step_hours=2):
+    print(f"Brute force fetching from {from_date} to {to_date} in {step_hours}-hour chunks...")
+    delta = datetime.timedelta(hours=step_hours)
+    current_start = from_date
+    all_chunks = []
+
+    while current_start < to_date:
+        current_end = min(current_start + delta, to_date)
+        try:
+            chunk_df = get_readings(token, site_id, device_id, current_start, current_end)
+            if not chunk_df.empty:
+                all_chunks.append(chunk_df)
+        except Exception as e:
+            print(f"Warning: Failed to fetch from {current_start} to {current_end}: {e}")
+        current_start = current_end
+
+    if not all_chunks:
+        print("No data retrieved.")
+        return pd.DataFrame()
+
+    merged_df = (
+        pd.concat(all_chunks)
+        .drop_duplicates(subset="timestamp")
+        .sort_values("timestamp")
+        .reset_index(drop=True)
+    )
+
+    print(f"Retrieved {len(merged_df)} rows total.")
+    return merged_df
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="GroGuru Data Fetcher")
+    parser.add_argument("--site", type=str, help="Site ID", required=False)
+    parser.add_argument("--start", type=str, help="Start date (YYYY-MM-DD)", required=False)
+    parser.add_argument("--end", type=str, help="End date (YYYY-MM-DD)", required=False)
+    args = parser.parse_args()
+
     try:
         token, userid = authenticate(GROGURU_EMAIL, GROGURU_PASSWORD)
         org_data = get_organization_view(token, userid)
-
         sites = list_sites_from_org(org_data)
-        print("Available Sites:")
-        for site in sites:
-            print(f" - {site['farm']} / {site['name']} (siteId: {site['siteId']}, twigId: {site['twigId']})")
 
         if not sites:
             print("No sites found.")
             sys.exit(0)
 
-        selected_site = input("Enter a siteId to fetch readings: ").strip()
-        matching_sites = [s for s in sites if str(s["siteId"]) == selected_site]
-        if not matching_sites:
-            print("SiteId not found.")
-            sys.exit(1)
+        if args.site and args.start and args.end:
+            selected_site_id = args.site
+            matching_sites = [s for s in sites if str(s["siteId"]) == selected_site_id]
+            if not matching_sites:
+                print("SiteId not found.")
+                sys.exit(1)
+            twig_id = matching_sites[0]["devices"][0]
+            from_date = datetime.datetime.strptime(args.start, "%Y-%m-%d")
+            to_date = datetime.datetime.strptime(args.end, "%Y-%m-%d")
+            df = get_brute_force_readings(token, selected_site_id, twig_id, from_date, to_date)
+            print(df.head())
 
-        twig_id = matching_sites[0]["twigId"]
-        print(f"Using twigId (deviceId): {twig_id}")
+        else:
+            print("Available Sites:")
+            for site in sites:
+                print(f" - {site['farm']} / {site['name']} (siteId: {site['siteId']})")
 
-        start_str = input("Enter start date (YYYY-MM-DD): ").strip()
-        end_str = input("Enter end date (YYYY-MM-DD): ").strip()
+            selected_site_id = input("Enter a siteId to fetch readings: ").strip()
+            matching_sites = [s for s in sites if str(s["siteId"]) == selected_site_id]
+            if not matching_sites:
+                print("SiteId not found.")
+                sys.exit(1)
 
-        try:
-            from_date = datetime.datetime.strptime(start_str, "%Y-%m-%d")
-            to_date = datetime.datetime.strptime(end_str, "%Y-%m-%d")
-            if from_date > to_date:
-                raise ValueError("Start date must be before end date.")
-        except ValueError as ve:
-            print(f"Invalid date format: {ve}")
-            sys.exit(1)
+            twig_id = matching_sites[0]["devices"][0]
+            print(f"Using twigId (deviceId): {twig_id}")
+            start_str = input("Enter start date (YYYY-MM-DD): ").strip()
+            end_str = input("Enter end date (YYYY-MM-DD): ").strip()
 
-        df = get_readings(token, selected_site, twig_id, from_date, to_date)
+            try:
+                from_date = datetime.datetime.strptime(start_str, "%Y-%m-%d")
+                to_date = datetime.datetime.strptime(end_str, "%Y-%m-%d")
+                if from_date > to_date:
+                    raise ValueError("Start date must be before end date.")
+            except ValueError as ve:
+                print(f"Invalid date format: {ve}")
+                sys.exit(1)
+
+            df = get_brute_force_readings(token, selected_site_id, twig_id, from_date, to_date)
+            print(df.head())
 
     except Exception as e:
         print(f"Error: {e}")

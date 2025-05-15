@@ -132,6 +132,57 @@ This will:
 
 - Log all output and errors to /home/user/logs/irrimax.log
 
+#### 4.3.2 • GroGuru InSites via `get_readings()`
+To automate data ingestion:
+
+#### 4.3.2 • GroGuru InSites via `get_brute_force_readings()`
+
+To automate GroGuru data collection from a known site:
+
+1. **Create a runner script (e.g., `groguru_pull.py`):**
+
+```python
+from groguru_scraper import authenticate, get_organization_view, list_sites_from_org, get_brute_force_readings
+import datetime
+import config
+
+# Authenticate and fetch organization structure
+token, userid = authenticate(config.GROGURU_USERNAME, config.GROGURU_PASSWORD)
+org_data = get_organization_view(token, userid)
+sites = list_sites_from_org(org_data)
+
+# Choose a specific siteId and deviceId (twigId is auto-selected as first device)
+site_id = "11697"  # Replace with your actual GroGuru siteId
+device_id = sites[0]["devices"][0]  # Automatically selects the first twigId
+
+# Define date range
+to_date = datetime.datetime.utcnow()
+from_date = to_date - datetime.timedelta(days=1)
+
+# Fetch data using brute-force workaround
+df = get_brute_force_readings(token, site_id, device_id, from_date, to_date)
+
+# Save to CSV
+if not df.empty:
+    out_path = f"/home/user/data/groguru_{site_id}_{from_date:%Y%m%d}.csv"
+    df.to_csv(out_path, index=False)
+```
+2. **Add the task to your crontab (`crontab -e`):**
+
+```cron
+30 3 * * * /usr/bin/python3 /home/user/scripts/groguru_pull.py >> /home/user/logs/groguru.log 2>&1
+```
+
+This will:
+
+- Run daily at 3:30 AM
+
+- Save a GroGuru CSV with the last 24 hours of data
+
+- Log output/errors to /home/user/logs/groguru.log
+
+> [!NOTE]
+> The GroGuru API limits each request to 5 data points. get_brute_force_readings() uses a looping strategy with 2-hour windows to stitch together full time series.
 ## 5 • Common Features
 
 * **Secure authentication** — credentials isolated in private config files.  

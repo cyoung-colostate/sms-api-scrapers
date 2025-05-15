@@ -35,10 +35,6 @@ AQUASPY_SITE_IDS: List[int] = ["REPLACE_WITH_SITE_ID_1", "REPLACE_WITH_SITE_ID_2
 # ───────────────────────────────────────────────
 GROGURU_USERNAME: str = "REPLACE_WITH_YOUR_EMAIL"
 GROGURU_PASSWORD: str = "REPLACE_WITH_YOUR_PASSWORD"
-# Demo credentials:
-#GROGURU_USERNAME: str = "GroGuru Demo"
-#GROGURU_PASSWORD: str = "groguru"
-
 
 # ───────────────────────────────────────────────
 # Optional global settings
