@@ -9,13 +9,17 @@ Agricultural Data Scientist — CSU Agricultural Water Quality Program
 
 This repository houses **API-based data fetching tools** for three commercial soil‑moisture platforms:
 
-| Vendor        | API Docs / Swagger | Script |
-|---------------|--------------------|--------|
-| **Sentek IrriMAX Live v1.9** | <https://irrimaxlive.sentek.com.au/api/docs> | `irrimax_scraper.py` |
-| **AquaSpy** *(On-Hold)* | <https://agspy.aquaspy.com/apioverview> | `aquaspy_scraper.py` |
-| **GroGuru InSites** | <https://groguruinsites.docs.apiary.io/> | `groguru_scraper.py`|
+| Vendor              | API Docs from Company                                       | Script              | Reference Notes                           |
+|---------------------|----------------------------------------------------------|---------------------|--------------------------------------------|
+| **Sentek IrriMAX**  | [Irrimax Site](https://irrimaxlive.sentek.com.au/api/docs)  | [`irrimax_scraper.py`](code/irrimax_scraper.py) | [View Notes](docs/irrimax_api_info.md)       |
+| **AquaSpy** *(Hold)*| [AquaSpy Site](https://agspy.aquaspy.com/apioverview)   | [`aquaspy_scraper.py`](code/aquaspy_scraper.py) | [View Notes](docs/agspy_api_info.md)       |
+| **GroGuru InSites** | [GroGuru Site](https://groguruinsites.docs.apiary.io/)        | [`groguru_scraper.py`](code/groguru_scraper.py) | [View Notes](docs/groguru_info.md)         |
+
 
 All scrapers share a common goal: **fetch logger metadata + time‑series moisture data → return a tidy `pandas.DataFrame`** that can be streamed directly into **WISE Pro** (Water Irrigation Scheduling for Efficient Application).
+
+> [!IMPORTANT]
+> Before using a scraper, please review its corresponding markdown file in the `/docs/` folder, which are linked in the table above. These files contain important notes about API limitations, usage, and other relevant information.
 
 ---
 ## 📚 Table of Contents
