@@ -23,12 +23,12 @@ IRRIMAX_API_KEY: str = "REPLACE_WITH_YOUR_IRRIMAX_API_KEY"
 
 
 # ───────────────────────────────────────────────
-# 4. AquaSpy AgSpy
+# 2. AquaSpy (AgSpy API)
+#    Site-level access — username/password required
 # ───────────────────────────────────────────────
-AQUASPY_SITE_IDS: List[int] = ["REPLACE_WITH_SITE_ID_1", "REPLACE_WITH_SITE_ID_2"]
+AQUASPY_USERNAME: str = "REPLACE_WITH_YOUR_AQUASPY_USERNAME"
+AQUASPY_PASSWORD: str = "REPLACE_WITH_YOUR_AQUASPY_PASSWORD"
 
-# NOTE: While this API does not require authentication, ensure that the siteID 
-# values are kept confidential to prevent unauthorized data access.
 
 # ───────────────────────────────────────────────
 # 3. GroGuru InSites

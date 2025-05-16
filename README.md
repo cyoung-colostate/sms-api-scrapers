@@ -12,14 +12,30 @@ This repository houses **API-based data fetching tools** for three commercial so
 | Vendor        | API Docs / Swagger | Script |
 |---------------|--------------------|--------|
 | **Sentek IrriMAX Live v1.9** | <https://irrimaxlive.sentek.com.au/api/docs> | `irrimax_scraper.py` |
-| **AquaSpy**   | <https://agspy.aquaspy.com/apioverview> | `aquaspy_scraper.py` *(WIP)* |
-| **GroGuru InSites** | <https://groguruinsites.docs.apiary.io/> | `groguru_scraper.py` *(WIP)* |
+| **AquaSpy** *(On-Hold)* | <https://agspy.aquaspy.com/apioverview> | `aquaspy_scraper.py` |
+| **GroGuru InSites** | <https://groguruinsites.docs.apiary.io/> | `groguru_scraper.py`|
 
 All scrapers share a common goal: **fetch logger metadata + time‑series moisture data → return a tidy `pandas.DataFrame`** that can be streamed directly into **WISE Pro** (Water Irrigation Scheduling for Efficient Application).
 
 ---
+## 📚 Table of Contents
+- [1 • Project Scope](#1•project-scope)
+- [2 • How This Supports WISE Pro](#2•how-this-supports-wisepro)
+- [3 • Repository Layout](#3•repository-layout)
+- [4 • Quick Start](#4•quickstart)
+  - [4.1 • Configure Secrets](#41•configure-secrets)
+  - [4.2 • Run a scrape via console command (IrriMAX example)](#42-run-a-scrape-via-console-command-irrimax-example)
+  - [4.3 • Automated Cloud Deployment](#43•-example-usage-on-a-linux-server-automated-cloud-deployment)
+    - [4.3.1 • IrriMAX](#431•irrimax-live-via-get_readings)
+    - [4.3.2 • GroGuru](#432•groguru-insites-via-get_brute_force_readings)
+    - [4.3.3 • AquaSpy (On-Hold)](#433--aquaspy-agspy-api-metadata-only)
+- [5 • Common Features](#5•commonfeatures)
+- [6 • Known API Limitations by Vendor](#6•known-api-limitations-by-vendor)
+- [7 • Contributing](#7•contributing)
+- [8 • License](#8•license)
 
-## 2 • Why this matters for **WISE Pro**
+
+## 2 • How This Supports WISE Pro
 
 WISE Pro is an integrated decision‑support platform jointly developed by CSU, USDA‑ARS, and NMSU. It fuses real‑time sensing, machine‑learning data assimilation, and SWAT+/pyFAO56 modeling to generate **actionable irrigation & nutrient recommendations**.  
 Automated ingestion of Sentek, AquaSpy, and GroGuru data:
@@ -32,12 +48,28 @@ Automated ingestion of Sentek, AquaSpy, and GroGuru data:
 
 ## 3 • Repository Layout
 ```bash
-/code
-├── irrimax_scraper.py
-├── aquaspy_scraper.py # coming soon
-├── groguru_scraper.py # coming soon
-├── config_template.py # template to create user-specific config.h
-└── config.py # must be created by user and updated with credentials
+sms-api-scrapers/
+│
+├── README.md               # Project overview and usage instructions
+├── requirements.txt        # Shared Python dependencies
+├── login_info.md           # Manual record of usernames/passwords (not committed)
+├── LICENSE                 # GNU GPL v2.0 license
+├── .gitignore              # Prevents secrets and compiled files from being tracked
+│
+├── code/                   # All executable scraping scripts and configuration
+│   ├── irrimax_scraper.py       # Sentek IrriMAX API scraper
+│   ├── aquaspy_scraper.py       # AquaSpy API scraper (partially functional)
+│   ├── groguru_scraper.py       # GroGuru InSites API scraper
+│   ├── config_template.py       # Safe starter config file to copy and edit
+│   ├── config.py                # Local, untracked config with real credentials
+│   └── __pycache__/             # Compiled Python bytecode (ignored)
+│
+└── docs/                   # API documentation and notes (not for execution)
+    ├── irrimax_api_info.md       # IrriMAX v1.9 API documentation summary
+    ├── agspy_api_info.md         # AquaSpy AgSpy API limitations + usage notes
+    ├── groguru_info.md           # Usage notes and walkthrough for GroGuru API
+    └── groguruinsites.apib       # Original GroGuru API Blueprint (APIary format)
+
 ```
 
 ---
@@ -64,7 +96,7 @@ pip install -r requirements.txt
 
 3. Do not commit `config.py` - it is already listed in `.gitignore`
 
-### 4.2 Run a scrape (IrriMAX example)
+### 4.2 Run a scrape via console command (IrriMAX example)
 ```bash
 >python irrimax_scraper.py
 Choose an option:
@@ -132,8 +164,6 @@ This will:
 
 - Log all output and errors to /home/user/logs/irrimax.log
 
-#### 4.3.2 • GroGuru InSites via `get_readings()`
-To automate data ingestion:
 
 #### 4.3.2 • GroGuru InSites via `get_brute_force_readings()`
 
@@ -183,6 +213,22 @@ This will:
 
 > [!NOTE]
 > The GroGuru API limits each request to 5 data points. get_brute_force_readings() uses a looping strategy with 2-hour windows to stitch together full time series.
+
+#### 4.3.3 • AquaSpy AgSpy API (Metadata Only)
+
+The `aquaspy_scraper.py` script retrieves **site metadata** only. Seasonal data is unavailable unless AquaSpy probes are actively deployed and marked "InSeason" in the AquaSpy portal.
+
+Example run:
+
+```bash
+> python aquaspy_scraper.py
+Site 33853: Farm 1 - 4D - Block II
+  InSeason: False
+  HasEquipment: False
+  Customer: Farm 1
+```
+Seasonal data endpoints (`GetSeasonApiData`, `GetSeasonDifferentialApiData`) will return empty or error if the site has no `CurrentFieldSeasonID`. This integration is paused until sensor deployment.
+
 ## 5 • Common Features
 
 * **Secure authentication** — credentials isolated in private config files.  
@@ -194,9 +240,18 @@ This will:
 > [!NOTE] 
 > Data are returned in the same schema as the vendor provides; unification may be a feature added later.
 
+## 6 • Known API Limitations by Vendor
+
+| Vendor       | Limitation                                                                 |
+|--------------|----------------------------------------------------------------------------|
+| **AquaSpy**  | Requires hardcoded `siteID`s; no endpoint to list all available sites.     |
+|              | No seasonal data if `InSeason = False`. Only metadata retrieval possible.  |
+| **GroGuru**  | 5-point limit per request; requires looping workaround for full time series. |
+| **IrriMAX**  | CSV parsing may fail silently for malformed timestamps.                    |
+
 ---
 
-## 6 • Contributing
+## 7 • Contributing
 
 1. Fork → feature branch → PR.  
 2. Follow PEP8; run `black` before committing.  
@@ -204,7 +259,7 @@ This will:
 
 ---
 
-## 7 • License
+## 8 • License
 
 GNU General Public License v2.0  
 © 2025 Ansley Joseph Brown

@@ -1,14 +1,94 @@
 # AquaSpy AgSpy API Overview
+> [!NOTE]
+> 🛑 **TL;DR**: Integration is paused due to lack of in-season probes. Site IDs must be hardcoded, and no sensor data can be retrieved until AquaSpy hardware is deployed and activated in-season.
 
-## General Info
 
-The AgSpy API is a simple data API that returns information on moisture and other conditions for agricultural sites (fields) with AgSpy probes. Requests are made via web service, and the response is a JSON object.
+### AquaSpy Integration Note
 
-The primary unit of management is the **Site**, which corresponds to a plot of land where AgSpy probes are installed. Sites are identified by a unique 4-byte integer value (`SiteID`). This is the only required parameter to retrieve data. The data is not considered sensitive and is retrieved per site, not en masse.
+While AquaSpy exposes structured data over a web service, it does **not provide a conventional REST API**. The platform relies on fixed URLs with known site IDs, returns JSON embedded inside XML, and does not support authenticated user-based access or site discovery. We treat this as a static data feed rather than a dynamic, queryable API (e.g., no resource discovery, no user-level auth, no POST methods).
+
 
 ---
 
-## API Endpoints
+## ⚠️ AquaSpy API Integration Status
+
+The AquaSpy API integration is currently **on hold** due to deployment and platform constraints. Below is a summary of the current issues preventing full functionality:
+
+---
+
+### ❌ Current Limitations
+
+1. **No Sensors Currently Deployed**
+   - None of the monitored sites have AquaSpy sensors actively installed.
+   - As a result, `InSeason = False` and `CurrentFieldSeasonID = null` for all known `siteID`s.
+   - This prevents any historical or real-time sensor data from being accessed via the API.
+
+2. **Season Dependency for Data Access**
+   - The AquaSpy API requires that a site be marked as `InSeason = True` and have a valid `CurrentFieldSeasonID` to access:
+     - `GetSeasonApiData` – full seasonal time series
+     - `GetSeasonDifferentialApiData` – incremental updates
+   - `GetSeasonApiData` returns `null` if no `CurrentFieldSeasonID` exists.
+   - `GetSeasonDifferentialApiData` cannot run without a valid timestamp from an in-season probe.
+
+3. **Site ID Discovery is Manual**
+   - The API provides **no method to list all `siteID`s** accessible by a user.
+   - Site IDs must be known in advance and manually entered in the script.
+   - This is unlike other platforms (e.g., IrriMAX or GroGuru) that support logger/site discovery via authenticated API calls.
+
+---
+
+### ✅ Resolution Path (When Sensors Are Active)
+
+When AquaSpy sensors are deployed and a season is defined via the AquaSpy dealer portal:
+
+- `get_site_metadata(site_id)` will return a valid `CurrentFieldSeasonID`.
+- `get_season_data(season_id)` and `get_differential_data(season_id, timestamp)` will return valid time-series data.
+
+Until that point, the AquaSpy script will remain functional for metadata retrieval only, with data methods inactive.
+
+---
+
+### TODO
+
+- Revisit AquaSpy integration after sensor deployment and in-season activation.
+- Explore automation options for `siteID` discovery through internal records or support contact.
+
+## Example of Problem
+```python
+In [8]: # all sesnor IDs
+   ...: site_ids = [33853, 33856, 30759, 33857, 33858, 33859, 30756, 33860,
+   ...:             33861, 33862, 34533, 33863, 30757, 33854, 33855, 30758]
+   ...:
+   ...: for sid in site_ids:
+   ...:     try:
+   ...:         m = get_site_metadata(sid)
+   ...:         if m["CurrentFieldSeasonID"]:
+   ...:             print(f"✅ Site {sid} ({m['SiteDesc']}): SeasonID = {m['CurrentFieldSeasonID']}")
+   ...:         else:
+   ...:             print(f"⛔ Site {sid} ({m['SiteDesc']}): No Season ID")
+   ...:     except Exception as e:
+   ...:         print(f"⚠️ Site {sid} failed: {e}")
+   ...:
+⛔ Site 33853 (Farm 1 - 4D - Block II): No Season ID
+⛔ Site 33856 (Farm 12 - 1D - Block II): No Season ID
+⛔ Site 30759 (Farm 14 - TAPS 2023): No Season ID
+⛔ Site 33857 (Farm 16 - 10E - Block II): No Season ID
+⛔ Site 33858 (Farm 17 - 8E - Block II): No Season ID
+⛔ Site 33859 (Farm 19 - 4E - Block II): No Season ID
+⛔ Site 30756 (Farm 2 - TAPS 2023): No Season ID
+⛔ Site 33860 (Farm 21 - 1C - Block II): No Season ID
+⛔ Site 33861 (Farm 25 - 1E - Block II): No Season ID
+⛔ Site 33862 (Farm 26 - 7D - Block II): No Season ID
+⛔ Site 34533 (Farm 28 - 7H - Block R): No Season ID
+⛔ Site 33863 (Farm 29 - 8H - Block R): No Season ID
+⛔ Site 30757 (Farm 3 - TAPS 2023): No Season ID
+⛔ Site 33854 (Farm 6 - 10D - Block II): No Season ID
+⛔ Site 33855 (Farm 7 - 3E - Block II): No Season ID
+⛔ Site 30758 (Farm 8 - TAPS 2023): No Season ID
+```
+
+## API Documentation
+[https://agspy.aquaspy.com/apioverview](https://agspy.aquaspy.com/apioverview)
 
 **Web Service URL:**  
 `https://agspy.aquaspy.com/Proxies/SiteService.asmx`
