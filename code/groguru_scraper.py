@@ -11,6 +11,7 @@ Reference: https://groguruinsites.docs.apiary.io/
 '''
 
 import json  # for debugging
+import os
 import requests
 import datetime
 import pandas as pd
@@ -66,6 +67,7 @@ def get_organization_view(token, userid):
 
 def list_sites_from_org(org_data):
     """Flatten and extract site and device information from organization data."""
+    print("Extracting sites and devices from organization data...")
     site_dict = {}
     try:
         for farm in org_data.get("children", []):
@@ -85,6 +87,7 @@ def list_sites_from_org(org_data):
 
 def flatten_graph_data(graph):
     """Flatten the nested graph JSON data into a flat DataFrame."""
+    print("Flattening graph data...")
     all_data = {}
     for key, content in graph.items():
         abs_data = content.get("absolute")
@@ -108,6 +111,7 @@ def flatten_graph_data(graph):
 
 def get_raw_json(token, site_id, device_id, from_date, to_date):
     """Fetch raw JSON data from the GroGuru API for a given site and device."""
+    print(f"Fetching raw JSON for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
     headers = {"Authorization": token}
     params = {
         "fromDate": from_date.strftime("%Y-%m-%d"),
@@ -163,3 +167,78 @@ def get_brute_force_readings(token, site_id, device_id, from_date, to_date, step
 
     print(f"Retrieved {len(merged_df)} rows total.")
     return merged_df
+
+if __name__ == "__main__":
+    token, userid = authenticate(config.GROGURU_USERNAME, config.GROGURU_PASSWORD)
+    if len(sys.argv) == 4:
+        # Headless (cron/server) mode
+        _, logger_arg, start_arg, end_arg = sys.argv
+    else:
+        org_data = get_organization_view(token, userid)
+        sites = list_sites_from_org(org_data)
+
+        print(org_data)
+        print(sites)
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Fetch GroGuru sensor readings for all devices and save to CSV files"
+    )
+    parser.add_argument(
+        "--start", "-s", required=True,
+        help="Start date in YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "--end", "-e", required=True,
+        help="End date in YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "--brute", "-b", action="store_true",
+        help="Use brute force fetching (chunked) for full history"
+    )
+    parser.add_argument(
+        "--outdir", "-o", default=".",
+        help="Output directory for CSV files"
+    )
+
+    args = parser.parse_args()
+    try:
+        from_date = datetime.datetime.strptime(args.start, "%Y-%m-%d")
+        to_date = datetime.datetime.strptime(args.end, "%Y-%m-%d")
+    except ValueError as ve:
+        print(f"Date parse error: {ve}", file=sys.stderr)
+        sys.exit(1)
+
+    token, user_id = authenticate(config.GROGURU_USERNAME, config.GROGURU_PASSWORD)
+    org_data = get_organization_view(token, user_id)
+    sites = list_sites_from_org(org_data)
+
+    os.makedirs(args.outdir, exist_ok=True)
+
+    for site in sites:
+        site_id = site["siteId"]
+        site_name = site["name"]
+        for device_id in site["devices"]:
+            print(f"Processing site={site_name} ({site_id}), device={device_id}")
+            if args.brute:
+                df = get_brute_force_readings(token, site_id, device_id, from_date, to_date)
+            else:
+                df = get_readings(token, site_id, device_id, from_date, to_date)
+
+            if df.empty:
+                print(f"  → No data returned for {site_id}/{device_id}")
+                continue
+
+            # annotate metadata
+            df["farm"] = site["farm"]
+            df["site"] = site_name
+            df["device"] = device_id
+
+            fname = f"{site_id}_{device_id}.csv".replace("/", "_")
+            out_path = os.path.join(args.outdir, fname)
+            df.to_csv(out_path, index=False)
+            print(f"  → Wrote {len(df)} records to {out_path}")
+
+if __name__ == "__main__":
+    main()
