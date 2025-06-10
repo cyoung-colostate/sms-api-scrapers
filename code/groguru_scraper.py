@@ -21,6 +21,7 @@ from urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -142,9 +143,10 @@ def get_raw_json(token, site_id, device_id, from_date, to_date):
     else:
         raise Exception(f"Error fetching raw JSON: HTTP {response.status_code} - {response.text}")
 
-def get_readings(token, site_id, device_id, from_date, to_date):
+def get_readings(token, site_id, device_id, from_date, to_date, step_hours=2):
     """Fetch flattened sensor readings DataFrame for a site/device/date range."""
     logger.debug(f"Fetching readings for site {site_id} and device {device_id} from {from_date.date()} to {to_date.date()}...")
+    logger.debug(f"{step_hours} not needed but keeps signature consistent.")
     json_data = get_raw_json(token, site_id, device_id, from_date, to_date)
     graph_data = json_data.get("data", {}).get("graph", {})
     if not graph_data:
@@ -299,11 +301,66 @@ def main():
         logger.info("No data retrieved for any device.")
         sys.exit(0)
 
-    # concatenate all device data into one DataFrame
     combined = pd.concat(all_dfs, ignore_index=True)
 
     combined.to_csv(outfile, index=False)
     logger.info(f"Wrote {len(combined)} total records to {outfile}")
+
+
+    args_dict = {}
+    for k, v in vars(args).items():
+        if isinstance(v, datetime.datetime):
+            # format dates as YYYY-MM-DD
+            args_dict[k] = v.strftime("%Y-%m-%d")
+        else:
+            args_dict[k] = v
+    manifest = {
+        "run_started": datetime.datetime.now(datetime.timezone.utc).isoformat() + "Z",
+        "args": args_dict,
+        "site_summary": []
+    }
+
+    location_map = {}
+    for farm in org_data.get("children", []):
+        for s in farm.get("sites", []):
+            loc = s.get("location", {})
+            if isinstance(loc, dict) and "latitude" in loc and "longitude" in loc:
+                location_map[s["siteId"]] = {
+                    "latitude": loc["latitude"],
+                    "longitude": loc["longitude"]
+                }
+
+    for site in sites:
+        sid   = site["siteId"]
+        sname = site["name"]
+        for dev in site["devices"]:
+            # slice out just that device’s rows
+            subset = combined[
+                (combined["site"]   == sname) &
+                (combined["device"] == dev)
+            ]
+            if subset.empty:
+                status = "no_data"
+                last_ts = None
+            else:
+                status  = "success"
+                # take the max timestamp and render as ISO
+                last_ts = subset["timestamp"].max().isoformat()
+
+            manifest["site_summary"].append({
+                "siteId":        sid,
+                "siteName":      sname,
+                "deviceId":      dev,
+                "status":        status,
+                "last_timestamp": last_ts,
+                "location":      location_map.get(sid, {})
+            })
+
+    manifest_path = outdir / f"groguru_{args.end.strftime('%Y-%m-%d')}_manifest.json"
+    with open(manifest_path, "w") as mf:
+            json.dump(manifest, mf, indent=2)
+
+    logger.info(f"Wrote manifest with {len(manifest['site_summary'])} entries to {manifest_path}")
 
 if __name__ == "__main__":
     main()
