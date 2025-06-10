@@ -23,7 +23,7 @@ Sensor columns are structured as `<Type><Index>(<Depth>)`, for example, `A3(25)`
 | `V`    | Voltage                                  | Volts (V)        | System voltages, not tied to depth    |
 
 """
-
+import argparse
 import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -31,10 +31,17 @@ import datetime
 import sys
 from io import StringIO
 import config  # Contains IRRIMAX_API_KEY
+from pathlib import Path
 
 # Constants
 BASE_URL = "https://www.irrimaxlive.com/api/"
 API_KEY = config.IRRIMAX_API_KEY
+
+def valid_date(s):
+    try:
+        return datetime.datetime.strptime(s, "%Y-%m-%d")
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"Not a date: {s}")
 
 def get_loggers():
     """Fetch and parse logger details from IrriMAX Live API."""
@@ -163,51 +170,53 @@ def run_headless(logger_name, start_str, end_str):
             print(df.head())
     except Exception as e:
         print(f"Error: {e}")
+def main():
+    parser = argparse.ArgumentParser(
+        description="Fetch IrriMAX readings for all available loggers headless into CSV"
+    )
+    parser.add_argument(
+        "-s", "--start", required=True, type=valid_date,
+        help="Start date YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "-e", "--end", required=True, type=valid_date,
+        help="End date   YYYY-MM-DD"
+    )
+    parser.add_argument(
+        "-o", "--outfile", default=None,
+        help="CSV output file name (default: irrimax_{end}.csv)"
+    )
+
+    # If no args, drop to interactive
+    if len(sys.argv) == 1:
+        run_interactive()
+        return
+
+    args = parser.parse_args()
+
+    # headless: require both start and end
+    if not args.start or not args.end:
+        parser.error("--start and --end are required for headless mode.")
+
+    loggers = get_loggers()
+    logger_ids = [lg['logger_id'] for lg in loggers]
+
+    dfs = []
+    for lid in logger_ids:
+        try:
+            df = get_readings(lid, args.start, args.end)
+            if not df.empty:
+                df['logger_id'] = lid
+                dfs.append(df)
+        except Exception as e:
+            print(f"Warning: {lid} failed: {e}")
+
+    combined = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
+
+    out = args.outfile or f"irrimax_{args.end.strftime('%Y-%m-%d')}.csv"
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    combined.to_csv(out, index=False)
+    print(f"Wrote {len(combined)} records for {len(dfs)} loggers to {out}")
 
 if __name__ == "__main__":
-    if len(sys.argv) == 4:
-        # Headless (cron/server) mode
-        _, logger_arg, start_arg, end_arg = sys.argv
-        run_headless(logger_arg, start_arg, end_arg)
-    else:
-        # Interactive mode
-        run_interactive()
-
-
-# '''
-# Example Run:
-
-# Interactive mode:
-# (playground2) C:\Users\ansle\OneDrive\Documents\GitHub\sms-api-scrapers\code>python irrimax_scraper.py
-# Choose an option:
-# 1. List available loggers
-# 2. Fetch readings for a specific logger
-# Enter 1 or 2: 2
-# Enter logger name (case-sensitive): 8A_8
-# Enter start date (YYYY-MM-DD): 2024-06-10
-# Enter end date (YYYY-MM-DD): 2024-10-15
-
-# Fetching data for logger: 8A_8 (2024-06-10 to 2024-10-15)...
-#              Date Time      V1      V2     A1(5)     S1(5)  ...    S8(75)    T8(75)    A9(85)    S9(85)  T9(85)
-# 0  2024/06/10 00:00:00  13.735  13.474  16.63106  379.6608  ...  844.3812  17.04999  40.48423  4438.727   16.72
-# 1  2024/06/10 00:30:00  13.769  -1.000  16.62494  376.4792  ...  844.4537  17.04999  40.48423  4438.727   16.72
-# 2  2024/06/10 01:00:00  13.787  -1.000  16.62494  378.4209  ...  844.3812  17.01999  40.49162  4439.438   16.72
-# 3  2024/06/10 01:30:00  13.783  -1.000  16.58220  373.6646  ...  844.0801  16.95001  40.46944  4437.237   16.75
-# 4  2024/06/10 02:00:00  13.707  -1.000  16.60052  373.4932  ...  844.3039  17.00000  40.49162  4422.122   16.72
-
-# [5 rows x 30 columns]
-
-
-# Headless mode:
-# (playground2) C:\Users\ansle\OneDrive\Documents\GitHub\sms-api-scrapers\code>python irrimax_scraper.py 8A_8 2024-06-10 2024-10-15
-# Fetching data for logger: 8A_8 (2024-06-10 to 2024-10-15)...
-#              Date Time      V1      V2     A1(5)     S1(5)  ...    S8(75)    T8(75)    A9(85)    S9(85)  T9(85)
-# 0  2024/06/10 00:00:00  13.735  13.474  16.63106  379.6608  ...  844.3812  17.04999  40.48423  4438.727   16.72
-# 1  2024/06/10 00:30:00  13.769  -1.000  16.62494  376.4792  ...  844.4537  17.04999  40.48423  4438.727   16.72
-# 2  2024/06/10 01:00:00  13.787  -1.000  16.62494  378.4209  ...  844.3812  17.01999  40.49162  4439.438   16.72
-# 3  2024/06/10 01:30:00  13.783  -1.000  16.58220  373.6646  ...  844.0801  16.95001  40.46944  4437.237   16.75
-# 4  2024/06/10 02:00:00  13.707  -1.000  16.60052  373.4932  ...  844.3039  17.00000  40.49162  4422.122   16.72
-
-# [5 rows x 30 columns]
-
-# '''
+    main()
