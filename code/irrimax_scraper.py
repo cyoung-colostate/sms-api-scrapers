@@ -32,6 +32,16 @@ import sys
 from io import StringIO
 import config  # Contains IRRIMAX_API_KEY
 from pathlib import Path
+import logging
+
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    level=logging.INFO
+)
+
+session = requests.Session()
 
 # Constants
 BASE_URL = "https://www.irrimaxlive.com/api/"
@@ -43,10 +53,25 @@ def valid_date(s):
     except ValueError:
         raise argparse.ArgumentTypeError(f"Not a date: {s}")
 
+def parse_sensor(sensor_elem: ET.Element) -> dict:
+    """
+    Parse an XML <Sensor> element into a dict with the same keys
+    you were assembling in get_loggers().
+    """
+    return {
+        "name":        sensor_elem.get("name"),
+        "depth_cm":    int(sensor_elem.get("depth_cm")),
+        "type":        sensor_elem.get("type"),
+        "unit":        sensor_elem.get("unit"),
+        "description": sensor_elem.get("description"),
+        "min_value":   float(sensor_elem.get("minimum")),
+        "max_value":   float(sensor_elem.get("maximum")),
+    }
+
 def get_loggers():
     """Fetch and parse logger details from IrriMAX Live API."""
     url = f"{BASE_URL}?cmd=getloggers&key={API_KEY}"
-    response = requests.get(url)
+    response = session.get(url)
     if response.status_code == 200:
         root = ET.fromstring(response.content)
         loggers = []
@@ -70,16 +95,7 @@ def get_loggers():
                         "sensors": []
                     }
                     for sensor in probe.findall("Sensor"):
-                        sensor_info = {
-                            "name": sensor.get("name"),
-                            "depth_cm": int(sensor.get("depth_cm")),
-                            "type": sensor.get("type"),
-                            "unit": sensor.get("unit"),
-                            "description": sensor.get("description"),
-                            "min_value": float(sensor.get("minimum")),
-                            "max_value": float(sensor.get("maximum"))
-                        }
-                        probe_info["sensors"].append(sensor_info)
+                        probe_info["sensors"].append(parse_sensor(sensor))
                     site_info["probes"].append(probe_info)
                 logger_info["sites"].append(site_info)
             loggers.append(logger_info)
@@ -103,7 +119,7 @@ def get_readings(logger_name, from_date=None, to_date=None):
         params["to"] = to_date.strftime("%Y%m%d%H%M%S")
 
     url = f"{BASE_URL}?{requests.compat.urlencode(params)}"
-    response = requests.get(url)
+    response = session.get(url)
 
     if response.status_code == 200:
         csv_data = response.text.splitlines()
@@ -114,16 +130,16 @@ def get_readings(logger_name, from_date=None, to_date=None):
 
 def run_interactive():
     """Interactive console mode."""
-    print("Choose an option:")
-    print("1. List available loggers")
-    print("2. Fetch readings for a specific logger")
+    logger.info("Choose an option:")
+    logger.info("1. List available loggers")
+    logger.info("2. Fetch readings for a specific logger")
     choice = input("Enter 1 or 2: ").strip()
 
     if choice == "1":
         loggers = get_loggers()
-        print("\nAvailable Loggers:")
+        logger.info("\nAvailable Loggers:")
         for logger in loggers:
-            print(f" - {logger['name']}")
+            logger.info(f" - {logger['name']}")
     elif choice == "2":
         logger_name = input("Enter logger name (case-sensitive): ").strip()
 
@@ -135,42 +151,28 @@ def run_interactive():
                 from_date = datetime.datetime.strptime(start_str, "%Y-%m-%d")
                 to_date = datetime.datetime.strptime(end_str, "%Y-%m-%d")
 
-                print(f"\nFetching data for logger: {logger_name} ({from_date.date()} to {to_date.date()})...")
+                logger.info(f"\nFetching data for logger: {logger_name} ({from_date.date()} to {to_date.date()})...")
                 df = get_readings(logger_name, from_date, to_date)
 
                 if df.empty:
-                    print("No data found for the given date range.")
+                    logger.info("No data found for the given date range.")
                     retry = input("Try a new date range? (y/n): ").strip().lower()
                     if retry != "y":
-                        print("Exiting.")
+                        logger.info("Exiting.")
                         break
                 else:
-                    print(df.head())
+                    logger.info(df.head())
                     break
 
             except ValueError as ve:
-                print(f"Date Error: {ve}")
+                logger.error(f"Date Error: {ve}")
             except Exception as e:
-                print(f"Error: {e}")
+                logger.error(f"Error: {e}")
                 break
     else:
-        print("Invalid selection. Exiting.")
+        logger.error("Invalid selection. Exiting.")
 
-def run_headless(logger_name, start_str, end_str):
-    """Headless execution for cloud/cron usage."""
-    try:
-        from_date = datetime.datetime.strptime(start_str, "%Y-%m-%d")
-        to_date = datetime.datetime.strptime(end_str, "%Y-%m-%d")
-        print(f"Fetching data for logger: {logger_name} ({start_str} to {end_str})...")
-        df = get_readings(logger_name, from_date, to_date)
-
-        if df.empty:
-            print("No data found for the given date range.")
-        else:
-            print(df.head())
-    except Exception as e:
-        print(f"Error: {e}")
-def main():
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Fetch IrriMAX readings for all available loggers headless into CSV"
     )
@@ -186,40 +188,41 @@ def main():
         "-o", "--outfile", default=None,
         help="CSV output file name (default: irrimax_{end}.csv)"
     )
-
-    # If no args, drop to interactive
-    if len(sys.argv) == 1:
-        run_interactive()
-        return
-
     args = parser.parse_args()
 
-    # headless: require both start and end
-    if not args.start or not args.end:
-        parser.error("--start and --end are required for headless mode.")
+    return args
 
+
+def main(start: datetime.date, end: datetime.date, outfile: str | None = None) -> pd.DataFrame:
     loggers = get_loggers()
     logger_ids = [lg['logger_id'] for lg in loggers]
 
     dfs = []
     for lid in logger_ids:
         try:
-            df = get_readings(lid, args.start, args.end)
+            df = get_readings(lid, start, end)
             if not df.empty:
                 df['logger_id'] = lid
                 dfs.append(df)
         except Exception as e:
-            print(f"Warning: {lid} failed: {e}")
+            logger.warning(f"Warning: {lid} failed: {e}")
 
     combined = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
-    if args.outfile:
-        out_path = Path(args.outfile)
+    if outfile:
+        out_path = Path(outfile)
     else:
-        out_path = Path("data") / f"irrimax_{args.end.strftime('%Y-%m-%d')}.csv"
+        out_path = Path("data") / f"irrimax_{end.strftime('%Y-%m-%d')}.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     combined.to_csv(out_path, index=False)
-    print(f"Wrote {len(combined)} records for {len(dfs)} loggers to {out_path}")
+    logger.info(f"Wrote {len(combined)} records for {len(dfs)} loggers to {out_path}")
+    return (out_path, combined)
 
 if __name__ == "__main__":
-    main()
+    # no args → interactive mode
+    if len(sys.argv) == 1:
+        run_interactive()
+        sys.exit(0)
+    
+    args = parse_args()
+    main(args.start, args.end, args.outfile)
