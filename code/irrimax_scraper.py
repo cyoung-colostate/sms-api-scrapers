@@ -213,10 +213,13 @@ def main():
 
     combined = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
-    out = args.outfile or f"irrimax_{args.end.strftime('%Y-%m-%d')}.csv"
-    Path(out).parent.mkdir(parents=True, exist_ok=True)
-    combined.to_csv(out, index=False)
-    print(f"Wrote {len(combined)} records for {len(dfs)} loggers to {out}")
+    if args.outfile:
+        out_path = Path(args.outfile)
+    else:
+        out_path = Path("data") / f"irrimax_{args.end.strftime('%Y-%m-%d')}.csv"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    combined.to_csv(out_path, index=False)
+    print(f"Wrote {len(combined)} records for {len(dfs)} loggers to {out_path}")
 
 if __name__ == "__main__":
     main()
