@@ -24,6 +24,7 @@ Sensor columns are structured as `<Type><Index>(<Depth>)`, for example, `A3(25)`
 
 """
 import argparse
+from typing import Tuple, Optional
 import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -33,6 +34,7 @@ from io import StringIO
 import config  # Contains IRRIMAX_API_KEY
 from pathlib import Path
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed, Future
 
 logger = logging.getLogger(__name__)
 
@@ -47,11 +49,36 @@ session = requests.Session()
 BASE_URL = "https://www.irrimaxlive.com/api/"
 API_KEY = config.IRRIMAX_API_KEY
 
-def valid_date(s):
+def parse_datetime(s: str, default_to_end: bool) -> datetime.datetime:
+    """
+    Parse either a YYYY-MM-DD or a full ISO‐style YYYY-MM-DDTHH:MM:SS.
+    If only a date is given, set time = 00:00:00 (default_to_end=False)
+    or = 23:59:59 (default_to_end=True).
+    """
+    # try full timestamp first
+    for fmt in ("%Y-%m-%dT%H:%M:%SZ", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S"):
+        try:
+            return datetime.datetime.strptime(s, fmt)
+        except ValueError:
+            pass
+
+    # fall back to date only
     try:
-        return datetime.datetime.strptime(s, "%Y-%m-%d")
+        dt = datetime.datetime.strptime(s, "%Y-%m-%d")
     except ValueError:
-        raise argparse.ArgumentTypeError(f"Not a date: {s}")
+        raise argparse.ArgumentTypeError(f"Not a valid date or datetime: {s!r}")
+    
+    if default_to_end:
+        return dt.replace(hour=23, minute=59, second=59)
+    else:
+        return dt.replace(hour=0, minute=0, second=0)
+
+def valid_start(s: str) -> datetime.datetime:
+    return parse_datetime(s, default_to_end=False)
+
+def valid_end(s: str) -> datetime.datetime:
+    return parse_datetime(s, default_to_end=True)
+
 
 def parse_sensor(sensor_elem: ET.Element) -> dict:
     """
@@ -60,13 +87,27 @@ def parse_sensor(sensor_elem: ET.Element) -> dict:
     """
     return {
         "name":        sensor_elem.get("name"),
-        "depth_cm":    int(sensor_elem.get("depth_cm")),
+        "depth_cm":    int(sensor_elem.get("depth_cm", -1)),
         "type":        sensor_elem.get("type"),
         "unit":        sensor_elem.get("unit"),
         "description": sensor_elem.get("description"),
-        "min_value":   float(sensor_elem.get("minimum")),
-        "max_value":   float(sensor_elem.get("maximum")),
+        "min_value":   float(sensor_elem.get("minimum", -1)),
+        "max_value":   float(sensor_elem.get("maximum", -1)),
     }
+
+def fetch_for_logger(lid: str, start: datetime.datetime, end: datetime.datetime):
+    """
+    Wrapper around get_readings() that catches and logs errors,
+    and returns a DataFrame (or None on failure/empty).
+    """
+    try:
+        df = get_readings(lid, start, end)
+        if not df.empty:
+            df["logger_id"] = lid
+            return df
+    except Exception as e:
+        logger.warning("Logger %s failed: %s", lid, e)
+    return None
 
 def get_loggers():
     """Fetch and parse logger details from IrriMAX Live API."""
@@ -118,16 +159,17 @@ def get_readings(logger_name, from_date=None, to_date=None):
     if to_date:
         params["to"] = to_date.strftime("%Y%m%d%H%M%S")
 
-    url = f"{BASE_URL}?{requests.compat.urlencode(params)}"
-    response = session.get(url)
+    response = session.get(
+        BASE_URL,
+        params=params,
+        timeout=10
+    )
+    response.raise_for_status()
 
-    if response.status_code == 200:
-        csv_data = response.text.splitlines()
-        df = pd.read_csv(StringIO("\n".join(csv_data)))
-        return df
-    else:
-        raise Exception(f"Error fetching readings: {response.status_code} - {response.text}")
-
+    csv_data = response.text.splitlines()
+    df = pd.read_csv(StringIO("\n".join(csv_data)))
+    return df
+   
 def run_interactive():
     """Interactive console mode."""
     logger.info("Choose an option:")
@@ -144,13 +186,12 @@ def run_interactive():
         logger_name = input("Enter logger name (case-sensitive): ").strip()
 
         while True:
-            start_str = input("Enter start date (YYYY-MM-DD): ").strip()
-            end_str = input("Enter end date (YYYY-MM-DD): ").strip()
+            start_str = input("Enter start date or datetime (YYYY-MM-DD[THH:MM:SS]): ").strip()
+            end_str   = input("Enter end   date or datetime (YYYY-MM-DD[THH:MM:SS]): ").strip()
 
             try:
-                from_date = datetime.datetime.strptime(start_str, "%Y-%m-%d")
-                to_date = datetime.datetime.strptime(end_str, "%Y-%m-%d")
-
+                from_date = valid_start(start_str)
+                to_date   = valid_end(end_str)
                 logger.info(f"\nFetching data for logger: {logger_name} ({from_date.date()} to {to_date.date()})...")
                 df = get_readings(logger_name, from_date, to_date)
 
@@ -164,6 +205,9 @@ def run_interactive():
                     logger.info(df.head())
                     break
 
+            except argparse.ArgumentTypeError as e:
+                    logger.error("Bad date/time: %s", e)
+                    continue
             except ValueError as ve:
                 logger.error(f"Date Error: {ve}")
             except Exception as e:
@@ -177,46 +221,61 @@ def parse_args():
         description="Fetch IrriMAX readings for all available loggers headless into CSV"
     )
     parser.add_argument(
-        "-s", "--start", required=True, type=valid_date,
-        help="Start date YYYY-MM-DD"
+        "-s", "--start",
+        required=True,
+        type=valid_start,
+        help="Start date or datetime.  YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS"
     )
     parser.add_argument(
-        "-e", "--end", required=True, type=valid_date,
-        help="End date   YYYY-MM-DD"
+        "-e", "--end",
+        required=True,
+        type=valid_end,
+        help="End date or datetime.  YYYY-MM-DD or YYYY-MM-DDTHH:MM:SS"
     )
     parser.add_argument(
-        "-o", "--outfile", default=None,
-        help="CSV output file name (default: irrimax_{end}.csv)"
+        "-o", "--outfile",
+        default=None,
+        help="CSV file (default: data/irrimax_{end}.csv)"
     )
     args = parser.parse_args()
-
     return args
 
+def main(start: datetime.datetime,
+         end:   datetime.datetime,
+         outfile: str | None = None
+) -> Tuple[Path, pd.DataFrame]:
+    loggers    = get_loggers()
+    logger_ids = [lg["logger_id"] for lg in loggers]
 
-def main(start: datetime.date, end: datetime.date, outfile: str | None = None) -> pd.DataFrame:
-    loggers = get_loggers()
-    logger_ids = [lg['logger_id'] for lg in loggers]
+    # 1) fire off all fetches in parallel, remembering each index
+    futures: dict[Future, int] = {}
+    with ThreadPoolExecutor(max_workers=5) as executor:
+        for idx, lid in enumerate(logger_ids):
+            fut = executor.submit(fetch_for_logger, lid, start, end)
+            futures[fut] = idx
 
-    dfs = []
-    for lid in logger_ids:
-        try:
-            df = get_readings(lid, start, end)
-            if not df.empty:
-                df['logger_id'] = lid
-                dfs.append(df)
-        except Exception as e:
-            logger.warning(f"Warning: {lid} failed: {e}")
+        # 2) collect into a pre-sized list so order matches logger_ids
+        results: list[Optional[pd.DataFrame]] = [None] * len(logger_ids)
+        for fut in as_completed(futures):
+            idx = futures[fut]
+            results[idx] = fut.result()
 
+    # 3) drop any Nones and concatenate in original order
+    dfs = [df for df in results if df is not None]
     combined = pd.concat(dfs, ignore_index=True) if dfs else pd.DataFrame()
 
+    # 4) write the CSV (filename based on timestamp or --outfile)
     if outfile:
         out_path = Path(outfile)
     else:
-        out_path = Path("data") / f"irrimax_{end.strftime('%Y-%m-%d')}.csv"
+        start_timestamp = start.strftime("%Y%m%d%H%M%S")
+        end_timestamp = end.strftime("%Y%m%d%H%M%S")
+        out_path = Path("data") / f"irrimax_{start_timestamp}_{end_timestamp}.csv"
     out_path.parent.mkdir(parents=True, exist_ok=True)
     combined.to_csv(out_path, index=False)
+
     logger.info(f"Wrote {len(combined)} records for {len(dfs)} loggers to {out_path}")
-    return (out_path, combined)
+    return out_path, combined
 
 if __name__ == "__main__":
     # no args → interactive mode
