@@ -6,13 +6,16 @@ def sanitize_groguru(groguru_df: pd.DataFrame) -> pd.DataFrame:
     Convert the raw GroGuru DataFrame into a sanitized format suitable for Postgres.
     Columns produced:
       - source: 'groguru'
-      - logger_id: None (or you can modify to use site/device if available)
+      - farm: farm column
+      - site: site column
+      - logger_id: device column
       - timestamp: original timestamp column
       - depth: list of sensor indices (integers)
       - vwc: list of values from moistureX columns, in index order
       - conductivity: list of values from conductivityX columns, in index order
       - temperature: list of values from temp_fX columns, in index order
       - available_water: list of values from awX columns, in index order
+      - salinity: list of values from salinityX columns, in index order
     """
     # Patterns for each metric
     moisture_pattern = re.compile(r"^moisture(\d+)$", re.IGNORECASE)
@@ -86,6 +89,21 @@ def sanitize_groguru(groguru_df: pd.DataFrame) -> pd.DataFrame:
 
 
 def sanitize_irrimax(irrimax_df):
+    """
+    Convert the raw IrriMax DataFrame into a sanitized format suitable for Postgres.
+    Columns produced:
+      - source: 'irrimax'
+      - farm: None
+      - site: None
+      - logger_id: logger_id column
+      - timestamp: "Date Time" column converted to datetime
+      - depth: list of sensor indices (integers)
+      - vwc: list of values from moistureX columns, in index order
+      - conductivity: list of values from conductivityX columns, in index order
+      - temperature: list of values from temp_fX columns, in index order
+      - available_water: None
+      - salinity: None
+    """
     # 1) Extract (index, depth, col) for A, S, T columns
     a_pattern = re.compile(r"^A(\d+)\((\d+)\)$")
     s_pattern = re.compile(r"^S(\d+)\((\d+)\)$")
