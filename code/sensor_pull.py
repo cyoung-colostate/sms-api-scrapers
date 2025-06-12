@@ -140,7 +140,9 @@ def sanitize_groguru(groguru_df: pd.DataFrame) -> pd.DataFrame:
     # Build the clean DataFrame
     clean_df = pd.DataFrame({
         "source":         "groguru",
-        "logger_id":      None,
+        "farm":           groguru_df.get("farm", None),
+        "site":           groguru_df.get("site", None),
+        "logger_id":      groguru_df.get("device", None),
         "timestamp":      pd.to_datetime(groguru_df["timestamp"]),
         "depth":          [depths] * len(groguru_df),
         "vwc":            groguru_df[vwc_cols].values.tolist(),
@@ -192,6 +194,8 @@ def sanitize_irrimax(irrimax_df):
     # 4) Construct the new DataFrame
     clean_df = pd.DataFrame({
         "source": "irrimax",
+        "farm": None,
+        "site": None,
         "logger_id": irrimax_df["logger_id"],
         "timestamp": pd.to_datetime(irrimax_df["Date Time"], format="%Y/%m/%d %H:%M:%S"),
         "depth": [depths] * len(irrimax_df),
