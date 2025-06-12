@@ -1,3 +1,5 @@
 requests>=2.32.3
 pandas>=2.2.3
 python-dateutil
+sqlalchemy>=2.0.41
+typing-extensions>=4.14.0
