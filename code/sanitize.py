@@ -16,6 +16,7 @@ def sanitize_groguru(groguru_df: pd.DataFrame) -> pd.DataFrame:
       - temperature: list of values from temp_fX columns, in index order
       - available_water: list of values from awX columns, in index order
       - salinity: list of values from salinityX columns, in index order
+      - is_metric: False
     """
     # Patterns for each metric
     moisture_pattern = re.compile(r"^moisture(\d+)$", re.IGNORECASE)
@@ -82,7 +83,8 @@ def sanitize_groguru(groguru_df: pd.DataFrame) -> pd.DataFrame:
         "conductivity":   groguru_df[cond_cols].values.tolist(),
         "temperature":    groguru_df[temp_cols].values.tolist(),
         "available_water":groguru_df[aw_cols].values.tolist(),
-        "salinity":       groguru_df[salinity_cols].values.tolist()
+        "salinity":       groguru_df[salinity_cols].values.tolist(),
+        "is_metric":      False
     })
 
     return clean_df
@@ -103,6 +105,7 @@ def sanitize_irrimax(irrimax_df):
       - temperature: list of values from temp_fX columns, in index order
       - available_water: None
       - salinity: None
+      - is_metric: True
     """
     # 1) Extract (index, depth, col) for A, S, T columns
     a_pattern = re.compile(r"^A(\d+)\((\d+)\)$")
@@ -140,17 +143,18 @@ def sanitize_irrimax(irrimax_df):
 
     # 4) Construct the new DataFrame
     clean_df = pd.DataFrame({
-        "source": "irrimax",
-        "farm": None,
-        "site": None,
-        "logger_id": irrimax_df["logger_id"],
-        "timestamp": pd.to_datetime(irrimax_df["Date Time"], format="%Y/%m/%d %H:%M:%S"),
-        "depth": [depths] * len(irrimax_df),
-        "vwc": irrimax_df[vwc_cols].values.tolist(),
+        "source":       "irrimax",
+        "farm":         None,
+        "site":         None,
+        "logger_id":    irrimax_df["logger_id"],
+        "timestamp":    pd.to_datetime(irrimax_df["Date Time"], format="%Y/%m/%d %H:%M:%S"),
+        "depth":        [depths] * len(irrimax_df),
+        "vwc":          irrimax_df[vwc_cols].values.tolist(),
         "conductivity": irrimax_df[cond_cols].values.tolist(),
-        "temperature": irrimax_df[temp_cols].values.tolist(),
+        "temperature":  irrimax_df[temp_cols].values.tolist(),
         "available_water": None,
-        "salinity": None
+        "salinity":     None,
+        "is_metric":    True
     })
     
     return clean_df

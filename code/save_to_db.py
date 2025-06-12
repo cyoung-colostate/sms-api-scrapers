@@ -12,6 +12,7 @@ dtype_map = {
     "temperature":      postgresql.ARRAY(Float),
     "available_water":  postgresql.ARRAY(Float),
     "salinity":         postgresql.ARRAY(Float),
+    "is_metric":        postgresql.BOOLEAN,
     # the rest will be inferred (TEXT, TIMESTAMP, etc.)
 }
 
