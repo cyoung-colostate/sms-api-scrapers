@@ -1,9 +1,6 @@
-from sqlalchemy import create_engine
 from sqlalchemy.dialects import postgresql
 from sqlalchemy import Integer, Float
-
-DB_URL = "postgresql+psycopg2://username:password@hostname:5432/dbname"
-engine = create_engine(DB_URL)
+from db import engine
 
 dtype_map = {
     "depth":            postgresql.ARRAY(Integer),
@@ -18,9 +15,9 @@ dtype_map = {
 
 def save_to_db(df):
     df.to_sql(
-    name="sensor_data",
-    con=engine,
-    if_exists="append",
-    index=False,
-    dtype=dtype_map,
-)
+        name="sensor_data",
+        con=engine,
+        if_exists="append",
+        index=False,
+        dtype=dtype_map,
+    )

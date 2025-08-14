@@ -42,12 +42,17 @@ def fetch_for_logger(lid: str, start: datetime.datetime, end: datetime.datetime)
     """
     try:
         df = get_readings(lid, start, end)
-        if not df.empty:
-            df["logger_id"] = lid
-            return df
     except Exception as e:
         logger.warning("Logger %s failed: %s", lid, e)
-    return None
+        return None
+    
+    if df is None:
+        return None
+
+    # Always return a DataFrame; always include logger_id
+    df = df.copy()
+    df["logger_id"] = lid
+    return df
    
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -78,6 +83,9 @@ def main(start: datetime.datetime,
          outfile: str | None = None
 ) -> Tuple[Path, pd.DataFrame]:
     loggers    = get_loggers()
+    logger.info("get_loggers() returned %d loggers", len(loggers))
+    logger_ids = [lg.get("logger_id") for lg in loggers]
+    logger.info("First 30 logger_ids: %s", logger_ids[:30])
     logger_ids = [lg["logger_id"] for lg in loggers]
 
     # 1) fire off all fetches in parallel, remembering each index

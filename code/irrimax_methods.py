@@ -4,19 +4,26 @@ import pandas as pd
 from io import StringIO
 import config  # Contains IRRIMAX_API_KEY
 import logging
+import hashlib
+import os
 
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(
-    format="%(asctime)s %(levelname)-8s %(message)s",
-    level=logging.INFO
-)
+try:
+    logger.info("Config file: %s", getattr(config, "__file__", "<no __file__>"))
+    key_repr = getattr(config, "IRRIMAX_API_KEY", None)
+    if key_repr:
+        logger.info("IRRIMAX_API_KEY fingerprint: sha1=%s", hashlib.sha1(key_repr.encode()).hexdigest()[:10])
+    else:
+        logger.error("IRRIMAX_API_KEY is missing!")
+except Exception as _e:
+    logger.error("Config inspection failed: %r", _e)
 
 session = requests.Session()
 
 # Constants
 BASE_URL = "https://www.irrimaxlive.com/api/"
-API_KEY = config.IRRIMAX_API_KEY
+API_KEY = os.getenv("IRRIMAX_API_KEY", getattr(config, "IRRIMAX_API_KEY", None))
 
 def parse_sensor(sensor_elem: ET.Element) -> dict:
     """
@@ -36,7 +43,11 @@ def parse_sensor(sensor_elem: ET.Element) -> dict:
 def get_loggers():
     """Fetch and parse logger details from IrriMAX Live API."""
     url = f"{BASE_URL}?cmd=getloggers&key={API_KEY}"
-    response = session.get(url)
+    response = session.get(
+        url, 
+        headers={"Cache-Control": "no-cache"},
+        timeout=60
+    )
     if response.status_code == 200:
         root = ET.fromstring(response.content)
         loggers = []
@@ -85,8 +96,9 @@ def get_readings(logger_name, from_date=None, to_date=None):
 
     response = session.get(
         BASE_URL,
+        headers={"Cache-Control": "no-cache"},
         params=params,
-        timeout=10
+        timeout=20
     )
     response.raise_for_status()
 

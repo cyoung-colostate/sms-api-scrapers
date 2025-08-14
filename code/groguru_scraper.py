@@ -58,7 +58,7 @@ def authenticate(email, password):
             logger.info(f"Login successful. User: {data['data']['username']}")
             return data['data']['sessionToken'], data['data']['id']
         else:
-            logger.info("Login failed. Message:", data.get("message", "No message returned."))
+            logger.info("Login failed. Message: %s", data.get("message", "No message returned."))
             sys.exit(1)
     else:
         logger.info(f"Login failed. HTTP {response.status_code} - {response.text}")
@@ -76,7 +76,7 @@ def get_organization_view(token, userid):
             logger.info("Successfully fetched organization data.")
             return data["data"]
         else:
-            logger.info("Failed to retrieve organization data:", data.get("message", "No message."))
+            logger.info("Failed to retrieve organization data: %s", data.get("message", "No message."))
     else:
         logger.info(f"Failed to get organization view. HTTP {response.status_code} - {response.text}")
     return None
@@ -364,7 +364,7 @@ def main(start: datetime.datetime,
 
     if not all_dfs:
         logger.info("No data retrieved for any device.")
-        sys.exit(0)
+        return "", pd.DataFrame()
 
     combined = pd.concat(all_dfs, ignore_index=True)
 
@@ -391,9 +391,5 @@ def main(start: datetime.datetime,
 
 if __name__ == "__main__":
     args = parse_args()
-
-    level = logging.DEBUG if args.verbose else logging.INFO
-    logging.basicConfig(level=level,
-                        format="%(asctime)s %(levelname)s %(message)s")
     
     main(args.start, args.end, args.brute_force, args.outdir, args.outfile, args.chunk_hours, args.parallel)
